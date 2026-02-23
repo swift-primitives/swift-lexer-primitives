@@ -15,31 +15,48 @@ let package = Package(
         .library(
             name: "Lexer Primitives",
             targets: ["Lexer Primitives"]
-        )
+        ),
+        .library(
+            name: "Lexer Primitives Test Support",
+            targets: ["Lexer Primitives Test Support"]
+        ),
     ],
     dependencies: [
         .package(path: "../swift-token-primitives"),
-        .package(path: "../swift-source-primitives")
+        .package(path: "../swift-ascii-primitives"),
     ],
     targets: [
         .target(
             name: "Lexer Primitives",
             dependencies: [
                 .product(name: "Token Primitives", package: "swift-token-primitives"),
-                .product(name: "Source Primitives", package: "swift-source-primitives")
+                .product(name: "ASCII Primitives", package: "swift-ascii-primitives"),
             ]
-        )
+        ),
+        .target(
+            name: "Lexer Primitives Test Support",
+            dependencies: [
+                "Lexer Primitives",
+                .product(name: "Token Primitives Test Support", package: "swift-token-primitives"),
+            ],
+            path: "Tests/Support"
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let settings: [SwiftSetting] = [
+    let ecosystem: [SwiftSetting] = [
+        .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
         .enableExperimentalFeature("Lifetimes"),
-        .strictMemorySafety()
+        .enableExperimentalFeature("SuppressedAssociatedTypes"),
+        .enableExperimentalFeature("SuppressedAssociatedTypesWithDefaults"),
     ]
-    target.swiftSettings = (target.swiftSettings ?? []) + settings
+
+    let package: [SwiftSetting] = []
+
+    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
 }
