@@ -41,6 +41,12 @@ let package = Package(
             ],
             path: "Tests/Support"
         ),
+        .testTarget(
+            name: "Lexer Primitives Tests",
+            dependencies: [
+                "Lexer Primitives",
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
@@ -51,6 +57,7 @@ for target in package.targets where ![.system, .binary, .plugin, .macro].contain
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
+        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
         .enableExperimentalFeature("Lifetimes"),
         .enableExperimentalFeature("SuppressedAssociatedTypes"),
         .enableExperimentalFeature("SuppressedAssociatedTypesWithDefaults"),
