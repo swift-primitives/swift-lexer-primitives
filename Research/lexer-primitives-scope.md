@@ -2,9 +2,9 @@
 
 <!--
 ---
-version: 1.0.0
-last_updated: 2026-02-13
-status: IN_PROGRESS
+version: 1.0.1
+last_updated: 2026-03-15
+status: DEFERRED
 tier: 2
 ---
 -->
@@ -242,3 +242,15 @@ dependencies: [
 - swiftc `lib/Parse/Lexer.cpp`
 - Token-primitives research: `token-representation-model.md` (DECISION)
 - Token foundations literature study (RECOMMENDATION — no swift-token needed)
+
+---
+
+## Deferral
+
+**Date**: 2026-03-15
+**Previous status**: IN_PROGRESS (since 2026-02-13)
+**New status**: DEFERRED
+
+**Blocker/Reason**: Document defines the complete scope for lexer-primitives: Lexeme, Trivia, character classification, keyword lookup, error types, and concrete Scanner. Five design decisions (D1-D5) have recommendations but await formal approval. The package remains an empty stub. Deferred because the compiler infrastructure (lexer/parser) is not on the active roadmap -- current focus is on data structure primitives, typed throws, and rendering architecture.
+
+**Resumption trigger**: When the Primitives Swift compiler infrastructure becomes active, or when a consumer needs lexeme/trivia types.
