@@ -1,1 +1,1 @@
-public import Lexer_Primitives
+internal import Lexer_Primitives
