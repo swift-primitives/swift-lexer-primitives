@@ -299,7 +299,7 @@ extension Token.Keyword {
 
 /// Matches 4 bytes at the given pointer.
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matches(
     _ p: UnsafePointer<UInt8>,
     _ b0: UInt8, _ b1: UInt8, _ b2: UInt8, _ b3: UInt8
@@ -309,7 +309,7 @@ func _matches(
 
 /// Matches 5 bytes at the given pointer.
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matches5(
     _ p: UnsafePointer<UInt8>,
     _ b0: UInt8, _ b1: UInt8, _ b2: UInt8, _ b3: UInt8, _ b4: UInt8
@@ -320,7 +320,7 @@ func _matches5(
 
 /// Matches bytes 1...5 at the given pointer (byte 0 already checked by caller).
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matchesTail5(
     _ p: UnsafePointer<UInt8>,
     _ b1: UInt8, _ b2: UInt8, _ b3: UInt8, _ b4: UInt8, _ b5: UInt8
@@ -331,7 +331,7 @@ func _matchesTail5(
 
 /// Matches N bytes at the given pointer (variadic, for lengths 7-9).
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
@@ -344,7 +344,7 @@ func _matchesSuffix(
 }
 
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
@@ -357,7 +357,7 @@ func _matchesSuffix(
 }
 
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
@@ -372,7 +372,7 @@ func _matchesSuffix(
 
 /// Matches a long keyword using StaticString comparison.
 @usableFromInline
-@inline(__always)
+@inline(always)
 func _matchesLong(_ p: UnsafePointer<UInt8>, _ keyword: StaticString) -> Bool {
     let kp = unsafe keyword.utf8Start
     let count = keyword.utf8CodeUnitCount
