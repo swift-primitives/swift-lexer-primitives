@@ -88,6 +88,36 @@ struct LexerScannerTests {
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
+    @Test func hexLiteral() {
+        let (kinds, _) = kinds(from: "0xFF")
+        #expect(kinds == [.integerLiteral, .endOfFile])
+    }
+
+    @Test func binaryLiteral() {
+        let (kinds, _) = kinds(from: "0b1010")
+        #expect(kinds == [.integerLiteral, .endOfFile])
+    }
+
+    @Test func octalLiteral() {
+        let (kinds, _) = kinds(from: "0o77")
+        #expect(kinds == [.integerLiteral, .endOfFile])
+    }
+
+    @Test func floatingLiteral() {
+        let (kinds, _) = kinds(from: "3.14")
+        #expect(kinds == [.floatingLiteral, .endOfFile])
+    }
+
+    @Test func floatingLiteralWithExponent() {
+        let (kinds, _) = kinds(from: "1e10")
+        #expect(kinds == [.floatingLiteral, .endOfFile])
+    }
+
+    @Test func floatingLiteralWithFractionAndExponent() {
+        let (kinds, _) = kinds(from: "2.5e-3")
+        #expect(kinds == [.floatingLiteral, .endOfFile])
+    }
+
     // MARK: - String Literals
 
     @Test func stringLiteral() {
@@ -187,6 +217,54 @@ struct LexerScannerTests {
             // Trailing trivia is horizontal whitespace only — stops at newline.
             #expect(lexeme?.trailingTriviaLength == Text.Count(Cardinal(2)))
         }
+    }
+
+    // MARK: - Location Tracking
+
+    @Test func locationTracking() {
+        var source = "let\nx"
+        source.withUTF8 { utf8 in
+            let span = unsafe Span(
+                _unsafeStart: utf8.baseAddress!,
+                count: utf8.count
+            )
+            var scanner = Lexer.Scanner(span)
+            var diagnostics: [Lexer.Error] = []
+            // "let" on line 1
+            let first = scanner.next(diagnostics: &diagnostics)
+            #expect(first?.kind == .keyword(.let))
+            // "x" on line 2, column 1
+            let second = scanner.next(diagnostics: &diagnostics)
+            #expect(second?.kind == .identifier)
+            #expect(scanner.location.line == Text.Line.Number(2))
+        }
+    }
+
+    // MARK: - Conditional Compilation
+
+    @Test func poundIf() {
+        let (kinds, _) = kinds(from: "#if FOO")
+        #expect(kinds == [.poundIf, .identifier, .endOfFile])
+    }
+
+    @Test func poundElse() {
+        let (kinds, _) = kinds(from: "#else")
+        #expect(kinds == [.poundElse, .endOfFile])
+    }
+
+    @Test func poundEndif() {
+        let (kinds, _) = kinds(from: "#endif")
+        #expect(kinds == [.poundEndif, .endOfFile])
+    }
+
+    @Test func poundElseif() {
+        let (kinds, _) = kinds(from: "#elseif BAR")
+        #expect(kinds == [.poundElseif, .identifier, .endOfFile])
+    }
+
+    @Test func barePound() {
+        let (kinds, _) = kinds(from: "#foo")
+        #expect(kinds == [.pound, .identifier, .endOfFile])
     }
 
     // MARK: - Unknown Characters

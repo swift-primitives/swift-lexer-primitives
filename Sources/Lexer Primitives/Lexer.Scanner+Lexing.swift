@@ -70,21 +70,29 @@ extension Lexer.Scanner {
         while contains(cursor) {
             let b = byte(at: cursor)
             switch b {
-            case ASCII.Byte.space, ASCII.Byte.tab,
-                 ASCII.Byte.lf, ASCII.Byte.cr,
-                 ASCII.Byte.vtab, ASCII.Byte.ff:
+            case .ascii.space, .ascii.tab, .ascii.vtab, .ascii.ff:
                 cursor += .one
-            case ASCII.Byte.slash:
-                if peek(at: .one) == ASCII.Byte.slash {
+            case .ascii.cr:
+                tracker.newline(at: cursor)
+                cursor += .one
+                // CRLF: consume the LF so it isn't counted as a second newline.
+                if contains(cursor) && byte(at: cursor) == .ascii.lf {
+                    cursor += .one
+                }
+            case .ascii.lf:
+                tracker.newline(at: cursor)
+                cursor += .one
+            case .ascii.slash:
+                if peek(at: .one) == .ascii.slash {
                     // Line comment: skip to end of line.
                     cursor += .one
                     cursor += .one
                     while contains(cursor) {
                         let c = byte(at: cursor)
-                        if c == ASCII.Byte.lf || c == ASCII.Byte.cr { break }
+                        if c == .ascii.lf || c == .ascii.cr { break }
                         cursor += .one
                     }
-                } else if peek(at: .one) == ASCII.Byte.asterisk {
+                } else if peek(at: .one) == .ascii.asterisk {
                     comment(diagnostics: &diagnostics)
                 } else {
                     return
@@ -103,7 +111,7 @@ extension Lexer.Scanner {
     internal mutating func trailing() {
         while contains(cursor) {
             let b = byte(at: cursor)
-            guard b == ASCII.Byte.space || b == ASCII.Byte.tab else { return }
+            guard b == .ascii.space || b == .ascii.tab else { return }
             cursor += .one
         }
     }
@@ -121,14 +129,23 @@ extension Lexer.Scanner {
 
         while contains(cursor) && depth > 0 {
             let b = byte(at: cursor)
-            if b == ASCII.Byte.slash && peek(at: .one) == ASCII.Byte.asterisk {
+            if b == .ascii.slash && peek(at: .one) == .ascii.asterisk {
                 cursor += .one
                 cursor += .one
                 depth += 1
-            } else if b == ASCII.Byte.asterisk && peek(at: .one) == ASCII.Byte.slash {
+            } else if b == .ascii.asterisk && peek(at: .one) == .ascii.slash {
                 cursor += .one
                 cursor += .one
                 depth -= 1
+            } else if b == .ascii.cr {
+                tracker.newline(at: cursor)
+                cursor += .one
+                if contains(cursor) && byte(at: cursor) == .ascii.lf {
+                    cursor += .one
+                }
+            } else if b == .ascii.lf {
+                tracker.newline(at: cursor)
+                cursor += .one
             } else {
                 cursor += .one
             }
@@ -154,7 +171,7 @@ extension Lexer.Scanner {
         if Lexer.Classify.isIdentifierStart(b) {
             return identifier()
         }
-        if b == ASCII.Byte.dollarSign {
+        if b == .ascii.dollarSign {
             return dollar()
         }
         if Lexer.Classify.isDecimalDigit(b) {
@@ -162,20 +179,20 @@ extension Lexer.Scanner {
         }
 
         switch b {
-        case ASCII.Byte.doubleQuote:
+        case .ascii.doubleQuote:
             return string(diagnostics: &diagnostics)
 
-        case ASCII.Byte.hyphen:
-            if peek(at: .one) == ASCII.Byte.greaterThan {
+        case .ascii.hyphen:
+            if peek(at: .one) == .ascii.greaterThan {
                 cursor += .one
                 cursor += .one
                 return .arrow
             }
             return `operator`()
 
-        case ASCII.Byte.period:
-            if peek(at: .one) == ASCII.Byte.period
-                && peek(at: Text.Count(Cardinal(2))) == ASCII.Byte.period {
+        case .ascii.period:
+            if peek(at: .one) == .ascii.period
+                && peek(at: Text.Count(Cardinal(2))) == .ascii.period {
                 cursor += .one
                 cursor += .one
                 cursor += .one
@@ -184,24 +201,24 @@ extension Lexer.Scanner {
             cursor += .one
             return .period
 
-        case ASCII.Byte.leftBrace:              cursor += .one; return .leftBrace
-        case ASCII.Byte.rightBrace:             cursor += .one; return .rightBrace
-        case ASCII.Byte.leftParenthesis:        cursor += .one; return .leftParen
-        case ASCII.Byte.rightParenthesis:       cursor += .one; return .rightParen
-        case ASCII.Byte.leftBracket:            cursor += .one; return .leftBracket
-        case ASCII.Byte.rightBracket:           cursor += .one; return .rightBracket
-        case ASCII.Byte.colon:                  cursor += .one; return .colon
-        case ASCII.Byte.semicolon:              cursor += .one; return .semicolon
-        case ASCII.Byte.comma:                  cursor += .one; return .comma
-        case ASCII.Byte.atSign:                 cursor += .one; return .atSign
-        case ASCII.Byte.numberSign:             cursor += .one; return .pound
-        case ASCII.Byte.backslash:              cursor += .one; return .backslash
-        case ASCII.Byte.leftSingleQuotationMark: cursor += .one; return .backtick
-        case ASCII.Byte.tilde:                  cursor += .one; return .tilde
-        case ASCII.Byte.ampersand:              cursor += .one; return .ampersand
-        case ASCII.Byte.equalsSign:             cursor += .one; return .equal
-        case ASCII.Byte.exclamationPoint:       cursor += .one; return .exclamationMark
-        case ASCII.Byte.questionMark:           cursor += .one; return .questionMark
+        case .ascii.leftBrace:              cursor += .one; return .leftBrace
+        case .ascii.rightBrace:             cursor += .one; return .rightBrace
+        case .ascii.leftParenthesis:        cursor += .one; return .leftParen
+        case .ascii.rightParenthesis:       cursor += .one; return .rightParen
+        case .ascii.leftBracket:            cursor += .one; return .leftBracket
+        case .ascii.rightBracket:           cursor += .one; return .rightBracket
+        case .ascii.colon:                  cursor += .one; return .colon
+        case .ascii.semicolon:              cursor += .one; return .semicolon
+        case .ascii.comma:                  cursor += .one; return .comma
+        case .ascii.atSign:                 cursor += .one; return .atSign
+        case .ascii.numberSign:             return directive()
+        case .ascii.backslash:              cursor += .one; return .backslash
+        case .ascii.leftSingleQuotationMark: cursor += .one; return .backtick
+        case .ascii.tilde:                  cursor += .one; return .tilde
+        case .ascii.ampersand:              cursor += .one; return .ampersand
+        case .ascii.equalsSign:             cursor += .one; return .equal
+        case .ascii.exclamationPoint:       cursor += .one; return .exclamationMark
+        case .ascii.questionMark:           cursor += .one; return .questionMark
 
         case _ where Lexer.Classify.isOperatorStart(b):
             return `operator`()
@@ -229,7 +246,7 @@ extension Lexer.Scanner {
             cursor += .one
         }
 
-        if start + .one == cursor && byte(at: start) == ASCII.Byte.underline {
+        if start + .one == cursor && byte(at: start) == .ascii.underline {
             return .wildcard
         }
 
@@ -257,22 +274,122 @@ extension Lexer.Scanner {
         return .dollarIdentifier
     }
 
-    /// Scans a decimal integer literal.
+    /// Scans a numeric literal: decimal, hex (`0x`), binary (`0b`),
+    /// octal (`0o`), or floating-point (with `.` or `e`/`E` exponent).
     @inlinable
     @_lifetime(self: copy self)
     internal mutating func number() -> Token.Kind {
-        while contains(cursor)
-            && Lexer.Classify.isDecimalDigit(byte(at: cursor)) {
+        var isFloat = false
+        let first = byte(at: cursor)
+
+        // Prefixed bases: 0x, 0b, 0o
+        if first == .ascii.`0`, let next = peek(at: .one) {
+            switch next {
+            case .ascii.x, .ascii.X:
+                cursor += .one; cursor += .one
+                digits(Lexer.Classify.isHexDigit)
+                return .integerLiteral
+            case .ascii.b, .ascii.B:
+                cursor += .one; cursor += .one
+                digits(Lexer.Classify.isBinaryDigit)
+                return .integerLiteral
+            case .ascii.o, .ascii.O:
+                cursor += .one; cursor += .one
+                digits(Lexer.Classify.isOctalDigit)
+                return .integerLiteral
+            default: break
+            }
+        }
+
+        // Decimal digits
+        digits(Lexer.Classify.isDecimalDigit)
+
+        // Fractional part: '.' followed by digit
+        if contains(cursor) && byte(at: cursor) == .ascii.period {
+            if let d = peek(at: .one), Lexer.Classify.isDecimalDigit(d) {
+                cursor += .one
+                digits(Lexer.Classify.isDecimalDigit)
+                isFloat = true
+            }
+        }
+
+        // Exponent: e/E [+-]? digits
+        if contains(cursor) {
+            let b = byte(at: cursor)
+            if b == .ascii.e || b == .ascii.E {
+                cursor += .one
+                if contains(cursor) {
+                    let s = byte(at: cursor)
+                    if s == .ascii.plus || s == .ascii.hyphen { cursor += .one }
+                }
+                digits(Lexer.Classify.isDecimalDigit)
+                isFloat = true
+            }
+        }
+
+        return isFloat ? .floatingLiteral : .integerLiteral
+    }
+
+    /// Consumes digits (and underscore separators) for the given predicate.
+    @inlinable
+    @_lifetime(self: copy self)
+    internal mutating func digits(
+        _ predicate: (UInt8) -> Bool
+    ) {
+        while contains(cursor) && predicate(byte(at: cursor)) {
             cursor += .one
         }
-        while contains(cursor) && byte(at: cursor) == ASCII.Byte.underline {
+        while contains(cursor) && byte(at: cursor) == .ascii.underline {
             cursor += .one
-            while contains(cursor)
-                && Lexer.Classify.isDecimalDigit(byte(at: cursor)) {
+            while contains(cursor) && predicate(byte(at: cursor)) {
                 cursor += .one
             }
         }
-        return .integerLiteral
+    }
+
+    /// Scans a `#`-prefixed directive (`#if`, `#else`, `#elseif`, `#endif`)
+    /// or falls back to a bare `#` (`.pound`).
+    @inlinable
+    @_lifetime(self: copy self)
+    internal mutating func directive() -> Token.Kind {
+        let after = cursor + .one
+
+        // Probe identifier characters after '#' without advancing cursor.
+        var end = after
+        while contains(end) && Lexer.Classify.isIdentifierContinuation(byte(at: end)) {
+            end += .one
+        }
+
+        // Match known directives via span comparison.
+        let kind: Token.Kind? = extract(from: after, to: end)
+            .withUnsafeBufferPointer { buf -> Token.Kind? in
+                guard let p = unsafe buf.baseAddress else { return nil }
+                switch buf.count {
+                case 2 where unsafe p[0] == .ascii.i && p[1] == .ascii.f:
+                    return .poundIf
+                case 4 where unsafe p[0] == .ascii.e && p[1] == .ascii.l
+                          && p[2] == .ascii.s && p[3] == .ascii.e:
+                    return .poundElse
+                case 5 where unsafe p[0] == .ascii.e && p[1] == .ascii.n
+                          && p[2] == .ascii.d && p[3] == .ascii.i
+                          && p[4] == .ascii.f:
+                    return .poundEndif
+                case 6 where unsafe p[0] == .ascii.e && p[1] == .ascii.l
+                          && p[2] == .ascii.s && p[3] == .ascii.e
+                          && p[4] == .ascii.i && p[5] == .ascii.f:
+                    return .poundElseif
+                default:
+                    return nil
+                }
+            }
+
+        if let kind {
+            cursor = end
+            return kind
+        }
+
+        cursor = after
+        return .pound
     }
 
     /// Scans a double-quoted string literal. Handles `\"` escapes.
@@ -287,13 +404,13 @@ extension Lexer.Scanner {
         while contains(cursor) {
             let b = byte(at: cursor)
             switch b {
-            case ASCII.Byte.doubleQuote:
+            case .ascii.doubleQuote:
                 cursor += .one
                 return .stringLiteral
-            case ASCII.Byte.backslash:
+            case .ascii.backslash:
                 cursor += .one
                 if contains(cursor) { cursor += .one }
-            case ASCII.Byte.lf, ASCII.Byte.cr:
+            case .ascii.lf, .ascii.cr:
                 diagnostics.append(.unterminatedStringLiteral(at: start))
                 return .stringLiteral
             default:

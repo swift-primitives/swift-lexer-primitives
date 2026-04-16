@@ -43,12 +43,16 @@ extension Lexer {
         @usableFromInline
         internal var hasEmittedEndOfFile: Bool
 
+        @usableFromInline
+        internal var tracker: Text.Location.Tracker
+
         @inlinable
         @_lifetime(borrow source)
         public init(_ source: borrowing Span<UInt8>) {
             self.source = copy source
             self.cursor = .zero
             self.hasEmittedEndOfFile = false
+            self.tracker = Text.Location.Tracker()
         }
     }
 }
@@ -59,6 +63,11 @@ extension Lexer.Scanner {
     /// The current byte offset as a ``Text/Position``.
     @inlinable
     public var position: Text.Position { cursor }
+
+    /// The current line:column location, tracked incrementally via
+    /// ``Text/Location/Tracker``. O(1) — no binary search.
+    @inlinable
+    public var location: Text.Location { tracker.location(at: cursor) }
 
     /// Whether the scanner has consumed the entire source.
     @inlinable
