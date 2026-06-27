@@ -1,0 +1,9 @@
+# .github/metadata.yaml
+# Triaged by AI-assisted bulk pass (2026-04-29).
+description: "A resilient byte-level lexer/scanner that collects diagnostics and always advances over malformed input."
+topics:
+  - primitives
+  - lexer
+homepage: "https://swift-institute.org"
+readme:
+  family: E
