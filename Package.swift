@@ -37,7 +37,6 @@ let package = Package(
         // re-export).
         .package(url: "https://github.com/swift-primitives/swift-memory-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-byte-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-text-primitives.git", branch: "main"),
         // W3 PRUNE: direct dep so Lexer.Scanner.swift can import
         // Span_Protocol_Primitives for the Swift.Span: Span.`Protocol`
         // conformance (Finding 3/8).
