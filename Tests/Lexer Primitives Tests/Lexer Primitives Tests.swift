@@ -35,7 +35,7 @@ struct LexerScannerTests {
 
     // MARK: - Empty Input
 
-    @Test func emptyInput() {
+    @Test func `empty input`() {
         let (kinds, diagnostics) = kinds(from: "")
         #expect(kinds == [.endOfFile])
         #expect(diagnostics.isEmpty)
@@ -53,7 +53,7 @@ struct LexerScannerTests {
         #expect(kinds == [.keyword(.let), .endOfFile])
     }
 
-    @Test func multipleKeywords() {
+    @Test func `multiple keywords`() {
         let (kinds, _) = kinds(from: "var x")
         #expect(kinds == [.keyword(.var), .identifier, .endOfFile])
     }
@@ -63,66 +63,66 @@ struct LexerScannerTests {
         #expect(kinds == [.wildcard, .endOfFile])
     }
 
-    @Test func identifierStartingWithUnderscore() {
+    @Test func `identifier starting with underscore`() {
         let (kinds, _) = kinds(from: "_foo")
         #expect(kinds == [.identifier, .endOfFile])
     }
 
-    @Test func dollarIdentifier() {
+    @Test func `dollar identifier`() {
         let (kinds, _) = kinds(from: "$0")
         #expect(kinds == [.dollarIdentifier, .endOfFile])
     }
 
     // MARK: - Integer Literals
 
-    @Test func integerLiteral() {
+    @Test func `integer literal`() {
         let (kinds, _) = kinds(from: "42")
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
-    @Test func integerWithSeparators() {
+    @Test func `integer with separators`() {
         let (kinds, _) = kinds(from: "1_000")
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
-    @Test func hexLiteral() {
+    @Test func `hex literal`() {
         let (kinds, _) = kinds(from: "0xFF")
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
-    @Test func binaryLiteral() {
+    @Test func `binary literal`() {
         let (kinds, _) = kinds(from: "0b1010")
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
-    @Test func octalLiteral() {
+    @Test func `octal literal`() {
         let (kinds, _) = kinds(from: "0o77")
         #expect(kinds == [.integerLiteral, .endOfFile])
     }
 
-    @Test func floatingLiteral() {
+    @Test func `floating literal`() {
         let (kinds, _) = kinds(from: "3.14")
         #expect(kinds == [.floatingLiteral, .endOfFile])
     }
 
-    @Test func floatingLiteralWithExponent() {
+    @Test func `floating literal with exponent`() {
         let (kinds, _) = kinds(from: "1e10")
         #expect(kinds == [.floatingLiteral, .endOfFile])
     }
 
-    @Test func floatingLiteralWithFractionAndExponent() {
+    @Test func `floating literal with fraction and exponent`() {
         let (kinds, _) = kinds(from: "2.5e-3")
         #expect(kinds == [.floatingLiteral, .endOfFile])
     }
 
     // MARK: - String Literals
 
-    @Test func stringLiteral() {
+    @Test func `string literal`() {
         let (kinds, _) = kinds(from: #""hello""#)
         #expect(kinds == [.stringLiteral, .endOfFile])
     }
 
-    @Test func unterminatedString() {
+    @Test func `unterminated string`() {
         let (kinds, diagnostics) = kinds(from: #""hello"#)
         #expect(kinds == [.stringLiteral, .endOfFile])
         #expect(diagnostics.count == 1)
@@ -152,32 +152,32 @@ struct LexerScannerTests {
 
     // MARK: - Operators
 
-    @Test func binaryOperator() {
+    @Test func `binary operator`() {
         let (kinds, _) = kinds(from: "+")
         #expect(kinds == [.binaryOperator, .endOfFile])
     }
 
     // MARK: - Comments
 
-    @Test func lineComment() {
+    @Test func `line comment`() {
         let (kinds, diagnostics) = kinds(from: "// comment\nfoo")
         #expect(kinds == [.identifier, .endOfFile])
         #expect(diagnostics.isEmpty)
     }
 
-    @Test func blockComment() {
+    @Test func `block comment`() {
         let (kinds, diagnostics) = kinds(from: "/* comment */ foo")
         #expect(kinds == [.identifier, .endOfFile])
         #expect(diagnostics.isEmpty)
     }
 
-    @Test func nestedBlockComment() {
+    @Test func `nested block comment`() {
         let (kinds, diagnostics) = kinds(from: "/* /* nested */ */ foo")
         #expect(kinds == [.identifier, .endOfFile])
         #expect(diagnostics.isEmpty)
     }
 
-    @Test func unterminatedBlockComment() {
+    @Test func `unterminated block comment`() {
         let (kinds, diagnostics) = kinds(from: "/* unterminated")
         #expect(kinds == [.endOfFile])
         #expect(diagnostics.count == 1)
@@ -185,7 +185,7 @@ struct LexerScannerTests {
 
     // MARK: - Trivia Tracking
 
-    @Test func leadingTrivia() {
+    @Test func `leading trivia`() {
         let source = "  foo"
         let bytes: [Byte] = source.utf8.map(Byte.init)
         bytes.withUnsafeBufferPointer { buffer in
@@ -198,7 +198,7 @@ struct LexerScannerTests {
         }
     }
 
-    @Test func trailingTrivia() {
+    @Test func `trailing trivia`() {
         let source = "foo  \nbar"
         let bytes: [Byte] = source.utf8.map(Byte.init)
         bytes.withUnsafeBufferPointer { buffer in
@@ -214,7 +214,7 @@ struct LexerScannerTests {
 
     // MARK: - Location Tracking
 
-    @Test func locationTracking() {
+    @Test func `location tracking`() {
         let source = "let\nx"
         let bytes: [Byte] = source.utf8.map(Byte.init)
         bytes.withUnsafeBufferPointer { buffer in
@@ -233,34 +233,34 @@ struct LexerScannerTests {
 
     // MARK: - Conditional Compilation
 
-    @Test func poundIf() {
+    @Test func `pound if`() {
         let (kinds, _) = kinds(from: "#if FOO")
         #expect(kinds == [.poundIf, .identifier, .endOfFile])
     }
 
-    @Test func poundElse() {
+    @Test func `pound else`() {
         let (kinds, _) = kinds(from: "#else")
         #expect(kinds == [.poundElse, .endOfFile])
     }
 
-    @Test func poundEndif() {
+    @Test func `pound endif`() {
         let (kinds, _) = kinds(from: "#endif")
         #expect(kinds == [.poundEndif, .endOfFile])
     }
 
-    @Test func poundElseif() {
+    @Test func `pound elseif`() {
         let (kinds, _) = kinds(from: "#elseif BAR")
         #expect(kinds == [.poundElseif, .identifier, .endOfFile])
     }
 
-    @Test func barePound() {
+    @Test func `bare pound`() {
         let (kinds, _) = kinds(from: "#foo")
         #expect(kinds == [.pound, .identifier, .endOfFile])
     }
 
     // MARK: - Unknown Characters
 
-    @Test func unknownCharacter() {
+    @Test func `unknown character`() {
         let (kinds, diagnostics) = kinds(from: "§")
         // Multi-byte UTF-8 character — scanner advances past each byte.
         #expect(kinds.contains(.unknown))
@@ -269,7 +269,7 @@ struct LexerScannerTests {
 
     // MARK: - Mixed Input
 
-    @Test func simpleDeclaration() {
+    @Test func `simple declaration`() {
         let (kinds, _) = kinds(from: "let x = 42")
         #expect(
             kinds == [
@@ -282,7 +282,7 @@ struct LexerScannerTests {
         )
     }
 
-    @Test func functionSignature() {
+    @Test func `function signature`() {
         let (kinds, _) = kinds(from: "func f() -> Int")
         #expect(
             kinds == [

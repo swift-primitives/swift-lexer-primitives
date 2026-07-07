@@ -171,7 +171,7 @@ extension Lexer.Scanner {
     @inlinable
     public func peek<X: Byte.`Protocol`>() -> X? {
         guard let byte = inner.peek() else { return nil }
-        do {
+        do throws(X.Error) {
             return try X(byte)
         } catch {
             return nil
@@ -185,7 +185,7 @@ extension Lexer.Scanner {
     @inlinable
     public func peek<X: Byte.`Protocol`>(at offset: Text.Count) -> X? {
         guard let byte = inner.peek(at: offset) else { return nil }
-        do {
+        do throws(X.Error) {
             return try X(byte)
         } catch {
             return nil
@@ -304,7 +304,7 @@ extension Lexer.Scanner {
         // subtraction cannot underflow here — the `catch` is unreachable. `.zero`
         // is the safe default, consistent with the scanner's never-throw,
         // always-advance contract.
-        do {
+        do throws(Affine.Discrete.Vector.Error) {
             return try (end - start).magnitude
         } catch {
             return .zero

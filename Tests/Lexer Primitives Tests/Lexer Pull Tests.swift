@@ -19,7 +19,9 @@ import Testing
 /// container, `]` closes it. Whitespace bytes (0x20, 0x09, 0x0A, 0x0D)
 /// are skipped between tokens. No payload, no escapes — the smallest
 /// surface that exercises the generic substrate.
-enum BracketTokens: Lexer.Pull.Tokens {
+enum BracketTokens: Lexer.Pull.Tokens {}
+
+extension BracketTokens {
     enum Kind: Equatable, Hashable, Sendable {
         case open
         case close
@@ -211,7 +213,9 @@ struct LexerPullTests {
 }
 
 /// Minimal strategy witness exercising the FAST/SLOW gate.
-enum BracketCount: Lexer.Pull.Assemble.Strategy {
+enum BracketCount: Lexer.Pull.Assemble.Strategy {}
+
+extension BracketCount {
     typealias Tokens = BracketTokens
     typealias Value = Int
 
