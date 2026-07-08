@@ -265,7 +265,7 @@ extension Lexer.Scanner {
     /// Whether the source contains the given position.
     @inlinable
     @inline(__always)
-    internal func contains(_ position: Text.Position) -> Bool {
+    package func contains(_ position: Text.Position) -> Bool {
         Int(bitPattern: position) < source.count
     }
 
@@ -274,7 +274,7 @@ extension Lexer.Scanner {
     /// Caller must ensure in-bounds.
     @inlinable
     @inline(__always)
-    internal func byte(at position: Text.Position) -> Byte {
+    package func byte(at position: Text.Position) -> Byte {
         source[Int(bitPattern: position)]
     }
 
@@ -282,7 +282,7 @@ extension Lexer.Scanner {
     @inlinable
     @inline(__always)
     @_lifetime(borrow self)
-    internal func extract(
+    package func extract(
         from start: Text.Position,
         to end: Text.Position
     ) -> Swift.Span<Byte> {
@@ -296,7 +296,7 @@ extension Lexer.Scanner {
     /// Uses affine subtraction, returning the magnitude of the difference.
     @inlinable
     @inline(__always)
-    internal func distance(
+    package func distance(
         from start: Text.Position,
         to end: Text.Position
     ) -> Text.Count {

@@ -66,7 +66,7 @@ extension Lexer.Scanner {
     /// everything before the token, including vertical whitespace.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func leading(
+    package mutating func leading(
         diagnostics: inout [Lexer.Error]
     ) {
         while contains(cursor) {
@@ -115,7 +115,7 @@ extension Lexer.Scanner {
     @inlinable
     @inline(__always)
     @_lifetime(self: copy self)
-    internal mutating func trailing() {
+    package mutating func trailing() {
         while contains(cursor) {
             let b = byte(at: cursor)
             guard b == .ascii.space || b == .ascii.tab else { return }
@@ -126,7 +126,7 @@ extension Lexer.Scanner {
     /// Skips a block comment from `/*` through `*/`, supporting nesting.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func comment(
+    package mutating func comment(
         diagnostics: inout [Lexer.Error]
     ) {
         let start = cursor
@@ -170,7 +170,7 @@ extension Lexer.Scanner {
     /// Dispatches to the appropriate sub-scanner based on the current byte.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func token(
+    package mutating func token(
         diagnostics: inout [Lexer.Error]
     ) -> Token.Kind {
         let b = byte(at: cursor)
@@ -296,7 +296,7 @@ extension Lexer.Scanner {
     /// Scans an identifier or keyword.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func identifier() -> Token.Kind {
+    package mutating func identifier() -> Token.Kind {
         let start = cursor
         cursor += .one
 
@@ -325,7 +325,7 @@ extension Lexer.Scanner {
     /// Scans a dollar identifier (`$0`, `$1`, etc.).
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func dollar() -> Token.Kind {
+    package mutating func dollar() -> Token.Kind {
         cursor += .one
         while contains(cursor)
             && Lexer.Classify.isDecimalDigit(byte(at: cursor))
@@ -339,7 +339,7 @@ extension Lexer.Scanner {
     /// octal (`0o`), or floating-point (with `.` or `e`/`E` exponent).
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func number() -> Token.Kind {
+    package mutating func number() -> Token.Kind {
         var isFloat = false
         let first = byte(at: cursor)
 
@@ -400,7 +400,7 @@ extension Lexer.Scanner {
     /// Consumes digits (and underscore separators) for the given predicate.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func digits(
+    package mutating func digits(
         _ predicate: (Byte) -> Bool
     ) {
         while contains(cursor) && predicate(byte(at: cursor)) {
@@ -418,7 +418,7 @@ extension Lexer.Scanner {
     /// or falls back to a bare `#` (`.pound`).
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func directive() -> Token.Kind {
+    package mutating func directive() -> Token.Kind {
         let after = cursor + .one
 
         // Probe identifier characters after '#' without advancing cursor.
@@ -471,7 +471,7 @@ extension Lexer.Scanner {
     /// Handles `\"` escapes.
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func string(
+    package mutating func string(
         diagnostics: inout [Lexer.Error]
     ) -> Token.Kind {
         let start = cursor
@@ -504,7 +504,7 @@ extension Lexer.Scanner {
     /// Scans an operator (one or more operator-continuation characters).
     @inlinable
     @_lifetime(self: copy self)
-    internal mutating func `operator`() -> Token.Kind {
+    package mutating func `operator`() -> Token.Kind {
         cursor += .one
         while contains(cursor)
             && Lexer.Classify.isOperatorContinuation(byte(at: cursor))

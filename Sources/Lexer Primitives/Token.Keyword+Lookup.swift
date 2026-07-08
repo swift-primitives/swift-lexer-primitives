@@ -81,7 +81,7 @@ extension Token.Keyword {
 extension Token.Keyword {
     /// Matches keywords of length 2: as, do, if, in, is.
     @inlinable
-    init?(_length2 p: UnsafePointer<UInt8>) {
+    package init?(_length2 p: UnsafePointer<UInt8>) {
         switch (unsafe p[0], unsafe p[1]) {
         case (0x61, 0x73): self = .as  // "as"
         case (0x64, 0x6F): self = .do  // "do"
@@ -94,7 +94,7 @@ extension Token.Keyword {
 
     /// Matches keywords of length 3: any, for, get, let, nil, set, try, var.
     @inlinable
-    init?(_length3 p: UnsafePointer<UInt8>) {
+    package init?(_length3 p: UnsafePointer<UInt8>) {
         switch (unsafe p[0], unsafe p[1], unsafe p[2]) {
         case (0x61, 0x6E, 0x79): self = .any  // "any"
         case (0x66, 0x6F, 0x72): self = .for  // "for"
@@ -111,7 +111,7 @@ extension Token.Keyword {
     /// Matches keywords of length 4: case, each, else, enum, func, init,
     /// self, Self, some, true.
     @inlinable
-    init?(_length4 p: UnsafePointer<UInt8>) {
+    package init?(_length4 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x63:  // 'c'
             if unsafe _matches(p, 0x63, 0x61, 0x73, 0x65) {
@@ -182,7 +182,7 @@ extension Token.Keyword {
     /// Matches keywords of length 5: _read, break, catch, defer, false,
     /// guard, inout, throw, where, while, yield.
     @inlinable
-    init?(_length5 p: UnsafePointer<UInt8>) {
+    package init?(_length5 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x5F:  // '_'
             if unsafe _matches5(p, 0x5F, 0x72, 0x65, 0x61, 0x64) {
@@ -266,7 +266,7 @@ extension Token.Keyword {
     /// Matches keywords of length 6: deinit, import, public, repeat, return,
     /// static, struct, switch, throws.
     @inlinable
-    init?(_length6 p: UnsafePointer<UInt8>) {
+    package init?(_length6 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x64:  // 'd'
             if unsafe _matchesTail5(p, 0x65, 0x69, 0x6E, 0x69, 0x74) {
@@ -329,7 +329,7 @@ extension Token.Keyword {
 
     /// Matches keywords of length 7: _modify, default, discard, package, private.
     @inlinable
-    init?(_length7 p: UnsafePointer<UInt8>) {
+    package init?(_length7 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x5F:  // '_'
             if unsafe _matchesSuffix(p, count: 7, 0x5F, 0x6D, 0x6F, 0x64, 0x69, 0x66, 0x79) {
@@ -368,7 +368,7 @@ extension Token.Keyword {
     /// Matches keywords of length 8: continue, indirect, internal, mutating,
     /// operator, protocol.
     @inlinable
-    init?(_length8 p: UnsafePointer<UInt8>) {
+    package init?(_length8 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x63:  // 'c'
             if unsafe _matchesSuffix(p, count: 8, 0x63, 0x6F, 0x6E, 0x74, 0x69, 0x6E, 0x75, 0x65) {
@@ -417,7 +417,7 @@ extension Token.Keyword {
     /// Matches keywords of length 9: borrowing, consuming, extension,
     /// subscript, typealias.
     @inlinable
-    init?(_length9 p: UnsafePointer<UInt8>) {
+    package init?(_length9 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x62:  // 'b'
             if unsafe _matchesSuffix(p, count: 9, 0x62, 0x6F, 0x72, 0x72, 0x6F, 0x77, 0x69, 0x6E, 0x67) {
@@ -461,7 +461,7 @@ extension Token.Keyword {
 
     /// Matches keywords of length 11: fallthrough, fileprivate, nonmutating.
     @inlinable
-    init?(_length11 p: UnsafePointer<UInt8>) {
+    package init?(_length11 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x66:  // 'f'
             if unsafe _matchesLong(p, "fallthrough") {
@@ -488,7 +488,7 @@ extension Token.Keyword {
 
     /// Matches keywords of length 14: associatedtype.
     @inlinable
-    init?(_length14 p: UnsafePointer<UInt8>) {
+    package init?(_length14 p: UnsafePointer<UInt8>) {
         if unsafe _matchesLong(p, "associatedtype") {
             self = .associatedtype
             return
@@ -498,7 +498,7 @@ extension Token.Keyword {
 
     /// Matches keywords of length 15: precedencegroup.
     @inlinable
-    init?(_length15 p: UnsafePointer<UInt8>) {
+    package init?(_length15 p: UnsafePointer<UInt8>) {
         if unsafe _matchesLong(p, "precedencegroup") {
             self = .precedencegroup
             return
@@ -512,7 +512,7 @@ extension Token.Keyword {
 /// Matches 4 bytes at the given pointer.
 @inlinable
 @inline(always)
-func _matches(
+package func _matches(
     _ p: UnsafePointer<UInt8>,
     _ b0: UInt8,
     _ b1: UInt8,
@@ -525,7 +525,7 @@ func _matches(
 /// Matches 5 bytes at the given pointer.
 @inlinable
 @inline(always)
-func _matches5(
+package func _matches5(
     _ p: UnsafePointer<UInt8>,
     _ b0: UInt8,
     _ b1: UInt8,
@@ -540,7 +540,7 @@ func _matches5(
 /// Matches bytes 1...5 at the given pointer (byte 0 already checked by caller).
 @inlinable
 @inline(always)
-func _matchesTail5(
+package func _matchesTail5(
     _ p: UnsafePointer<UInt8>,
     _ b1: UInt8,
     _ b2: UInt8,
@@ -555,7 +555,7 @@ func _matchesTail5(
 /// Matches N bytes at the given pointer (variadic, for lengths 7-9).
 @inlinable
 @inline(always)
-func _matchesSuffix(
+package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
     _ b0: UInt8,
@@ -573,7 +573,7 @@ func _matchesSuffix(
 
 @inlinable
 @inline(always)
-func _matchesSuffix(
+package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
     _ b0: UInt8,
@@ -592,7 +592,7 @@ func _matchesSuffix(
 
 @inlinable
 @inline(always)
-func _matchesSuffix(
+package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
     _ b0: UInt8,
@@ -613,7 +613,7 @@ func _matchesSuffix(
 /// Matches a long keyword using StaticString comparison.
 @inlinable
 @inline(always)
-func _matchesLong(_ p: UnsafePointer<UInt8>, _ keyword: StaticString) -> Bool {
+package func _matchesLong(_ p: UnsafePointer<UInt8>, _ keyword: StaticString) -> Bool {
     let kp = unsafe keyword.utf8Start
     let count = keyword.utf8CodeUnitCount
     for i in 0..<count {
