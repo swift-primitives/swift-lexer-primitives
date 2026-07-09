@@ -12,8 +12,9 @@
 import Lexer_Primitives
 import Testing
 
-@Suite("Lexer.Scanner")
-struct LexerScannerTests {
+extension Lexer.Scanner {
+    @Suite("Lexer.Scanner")
+    struct Test {
 
     // MARK: - Helpers
 
@@ -295,5 +296,6 @@ struct LexerScannerTests {
                 .endOfFile,
             ]
         )
+    }
     }
 }

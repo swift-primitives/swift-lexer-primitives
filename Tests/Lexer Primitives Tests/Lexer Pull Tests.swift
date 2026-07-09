@@ -91,8 +91,9 @@ extension BracketTokens {
     }
 }
 
-@Suite("Lexer.Pull")
-struct LexerPullTests {
+extension Lexer.Pull {
+    @Suite("Lexer.Pull")
+    struct Test {
 
     private func withSpan<R>(
         _ source: String,
@@ -210,6 +211,7 @@ struct LexerPullTests {
             #expect(tail == nil)  // entire input consumed
         }
     }
+    }
 }
 
 /// Minimal strategy witness exercising the FAST/SLOW gate.
@@ -243,8 +245,9 @@ extension BracketCount {
     }
 }
 
-@Suite("Lexer.Pull.Assemble")
-struct LexerPullAssembleTests {
+extension Lexer.Pull.Assemble {
+    @Suite("Lexer.Pull.Assemble")
+    struct Test {
 
     private func withSpan<R>(
         _ source: String,
@@ -279,5 +282,6 @@ struct LexerPullAssembleTests {
             let count = try Lexer.Pull.Assemble.from(&stream, strategy: BracketCount.self)
             #expect(count == 2)
         }
+    }
     }
 }
