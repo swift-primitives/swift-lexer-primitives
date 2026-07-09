@@ -105,8 +105,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("Empty input yields nil immediately")
-    func emptyInput() throws {
+    @Test
+    func `Empty input yields nil immediately`() throws {
         try withSpan("") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             let first = try stream.next()
@@ -114,8 +114,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("Single empty container yields open then close")
-    func singleEmptyContainer() throws {
+    @Test
+    func `Single empty container yields open then close`() throws {
         try withSpan("[]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             let a = try stream.next()
@@ -127,8 +127,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("Whitespace is skipped between tokens")
-    func whitespaceSkipped() throws {
+    @Test
+    func `Whitespace is skipped between tokens`() throws {
         try withSpan("  [ \n\t ] ") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             let a = try stream.next()
@@ -140,8 +140,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("Nested containers update depth correctly")
-    func nestedDepth() throws {
+    @Test
+    func `Nested containers update depth correctly`() throws {
         try withSpan("[[[]]]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             for _ in 0..<3 {
@@ -157,8 +157,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("Depth limit is enforced")
-    func depthLimit() throws {
+    @Test
+    func `Depth limit is enforced`() throws {
         try withSpan("[[[") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span, limit: 2)
             let a = try stream.next()
@@ -171,8 +171,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("peek returns next significant byte without consuming")
-    func peekIdempotent() throws {
+    @Test
+    func `peek returns next significant byte without consuming`() throws {
         try withSpan("  [") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             #expect(stream.peek() == 0x5B)
@@ -182,8 +182,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("isPristine clears on first next()")
-    func pristineFlag() throws {
+    @Test
+    func `isPristine clears on first next()`() throws {
         try withSpan("[]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             #expect(stream.isPristine == true)
@@ -192,8 +192,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("position reports current byte offset")
-    func positionTracking() throws {
+    @Test
+    func `position reports current byte offset`() throws {
         try withSpan("  []") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             _ = try stream.next()  // advances past whitespace + '['
@@ -201,8 +201,8 @@ struct LexerPullTests {
         }
     }
 
-    @Test("skip on balanced nested container consumes the entire value")
-    func skipBalanced() throws {
+    @Test
+    func `skip on balanced nested container consumes the entire value`() throws {
         try withSpan("[[[]]]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             try stream.skip()  // consume one complete value at cursor
@@ -257,8 +257,8 @@ struct LexerPullAssembleTests {
         }
     }
 
-    @Test("FAST path fires when stream is pristine")
-    func fastPathPristine() throws {
+    @Test
+    func `FAST path fires when stream is pristine`() throws {
         try withSpan("[[[]]]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             #expect(stream.isPristine == true)
@@ -270,8 +270,8 @@ struct LexerPullAssembleTests {
         }
     }
 
-    @Test("SLOW path fires when stream is no longer pristine")
-    func slowPathTouched() throws {
+    @Test
+    func `SLOW path fires when stream is no longer pristine`() throws {
         try withSpan("[[[]]]") { span in
             var stream = Lexer.Pull.Stream<BracketTokens>(span)
             _ = try stream.next()  // pristine cleared; depth=1
