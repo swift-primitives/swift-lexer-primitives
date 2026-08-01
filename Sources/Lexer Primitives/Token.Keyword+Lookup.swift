@@ -616,8 +616,5 @@ package func _matchesSuffix(
 package func _matchesLong(_ p: UnsafePointer<UInt8>, _ keyword: StaticString) -> Bool {
     let kp = unsafe keyword.utf8Start
     let count = keyword.utf8CodeUnitCount
-    for i in 0..<count {
-        if unsafe (p[i] != kp[i]) { return false }
-    }
-    return true
+    return (0..<count).allSatisfy { unsafe p[$0] == kp[$0] }
 }

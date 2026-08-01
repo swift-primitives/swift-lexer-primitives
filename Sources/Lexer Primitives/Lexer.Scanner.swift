@@ -247,6 +247,10 @@ extension Lexer.Scanner {
     @usableFromInline
     internal var cursor: Text.Position {
         @inlinable
+        // swift-linter:disable:next raw value access
+        // REASON: same-package forwarding accessor onto the wrapped
+        // Cursor<Text>'s own boundary — preserves the legacy `cursor` read
+        // site inside lexer hot loops.
         get { inner.position }
         @inlinable
         @_lifetime(self: copy self)

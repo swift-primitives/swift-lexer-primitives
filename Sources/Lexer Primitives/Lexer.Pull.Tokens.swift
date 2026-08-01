@@ -40,7 +40,7 @@ extension Lexer.Pull {
     /// useful but is not the whole story for such formats.
     public protocol Tokens {
         /// The format's structural-token kind enum.
-        associatedtype Kind: Equatable & Hashable & Sendable
+        associatedtype Kind: Hashable & Sendable
 
         /// The format's error type for token-level failures.
         associatedtype Error: Swift.Error
