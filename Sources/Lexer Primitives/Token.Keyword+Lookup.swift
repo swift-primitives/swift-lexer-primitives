@@ -332,29 +332,29 @@ extension Token.Keyword {
     package init?(_length7 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x5F:  // '_'
-            if unsafe _matchesSuffix(p, count: 7, 0x5F, 0x6D, 0x6F, 0x64, 0x69, 0x66, 0x79) {
+            if unsafe _matchesSuffix(p, count: 7, (0x5F, 0x6D, 0x6F, 0x64, 0x69, 0x66, 0x79)) {
                 self = ._modify
                 return
             }  // "_modify"
             return nil
 
         case 0x64:  // 'd'
-            if unsafe _matchesSuffix(p, count: 7, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6C, 0x74) {
+            if unsafe _matchesSuffix(p, count: 7, (0x64, 0x65, 0x66, 0x61, 0x75, 0x6C, 0x74)) {
                 self = .default
                 return
             }  // "default"
-            if unsafe _matchesSuffix(p, count: 7, 0x64, 0x69, 0x73, 0x63, 0x61, 0x72, 0x64) {
+            if unsafe _matchesSuffix(p, count: 7, (0x64, 0x69, 0x73, 0x63, 0x61, 0x72, 0x64)) {
                 self = .discard
                 return
             }  // "discard"
             return nil
 
         case 0x70:  // 'p'
-            if unsafe _matchesSuffix(p, count: 7, 0x70, 0x61, 0x63, 0x6B, 0x61, 0x67, 0x65) {
+            if unsafe _matchesSuffix(p, count: 7, (0x70, 0x61, 0x63, 0x6B, 0x61, 0x67, 0x65)) {
                 self = .package
                 return
             }  // "package"
-            if unsafe _matchesSuffix(p, count: 7, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65) {
+            if unsafe _matchesSuffix(p, count: 7, (0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65)) {
                 self = .private
                 return
             }  // "private"
@@ -371,39 +371,45 @@ extension Token.Keyword {
     package init?(_length8 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x63:  // 'c'
-            if unsafe _matchesSuffix(p, count: 8, 0x63, 0x6F, 0x6E, 0x74, 0x69, 0x6E, 0x75, 0x65) {
+            if unsafe _matchesSuffix(p, count: 8, (0x63, 0x6F, 0x6E, 0x74, 0x69, 0x6E, 0x75, 0x65))
+            {
                 self = .continue
                 return
             }  // "continue"
             return nil
 
         case 0x69:  // 'i'
-            if unsafe _matchesSuffix(p, count: 8, 0x69, 0x6E, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74) {
+            if unsafe _matchesSuffix(p, count: 8, (0x69, 0x6E, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74))
+            {
                 self = .indirect
                 return
             }  // "indirect"
-            if unsafe _matchesSuffix(p, count: 8, 0x69, 0x6E, 0x74, 0x65, 0x72, 0x6E, 0x61, 0x6C) {
+            if unsafe _matchesSuffix(p, count: 8, (0x69, 0x6E, 0x74, 0x65, 0x72, 0x6E, 0x61, 0x6C))
+            {
                 self = .internal
                 return
             }  // "internal"
             return nil
 
         case 0x6D:  // 'm'
-            if unsafe _matchesSuffix(p, count: 8, 0x6D, 0x75, 0x74, 0x61, 0x74, 0x69, 0x6E, 0x67) {
+            if unsafe _matchesSuffix(p, count: 8, (0x6D, 0x75, 0x74, 0x61, 0x74, 0x69, 0x6E, 0x67))
+            {
                 self = .mutating
                 return
             }  // "mutating"
             return nil
 
         case 0x6F:  // 'o'
-            if unsafe _matchesSuffix(p, count: 8, 0x6F, 0x70, 0x65, 0x72, 0x61, 0x74, 0x6F, 0x72) {
+            if unsafe _matchesSuffix(p, count: 8, (0x6F, 0x70, 0x65, 0x72, 0x61, 0x74, 0x6F, 0x72))
+            {
                 self = .operator
                 return
             }  // "operator"
             return nil
 
         case 0x70:  // 'p'
-            if unsafe _matchesSuffix(p, count: 8, 0x70, 0x72, 0x6F, 0x74, 0x6F, 0x63, 0x6F, 0x6C) {
+            if unsafe _matchesSuffix(p, count: 8, (0x70, 0x72, 0x6F, 0x74, 0x6F, 0x63, 0x6F, 0x6C))
+            {
                 self = .protocol
                 return
             }  // "protocol"
@@ -420,35 +426,55 @@ extension Token.Keyword {
     package init?(_length9 p: UnsafePointer<UInt8>) {
         switch unsafe p[0] {
         case 0x62:  // 'b'
-            if unsafe _matchesSuffix(p, count: 9, 0x62, 0x6F, 0x72, 0x72, 0x6F, 0x77, 0x69, 0x6E, 0x67) {
+            if unsafe _matchesSuffix(
+                p,
+                count: 9,
+                (0x62, 0x6F, 0x72, 0x72, 0x6F, 0x77, 0x69, 0x6E, 0x67)
+            ) {
                 self = .borrowing
                 return
             }  // "borrowing"
             return nil
 
         case 0x63:  // 'c'
-            if unsafe _matchesSuffix(p, count: 9, 0x63, 0x6F, 0x6E, 0x73, 0x75, 0x6D, 0x69, 0x6E, 0x67) {
+            if unsafe _matchesSuffix(
+                p,
+                count: 9,
+                (0x63, 0x6F, 0x6E, 0x73, 0x75, 0x6D, 0x69, 0x6E, 0x67)
+            ) {
                 self = .consuming
                 return
             }  // "consuming"
             return nil
 
         case 0x65:  // 'e'
-            if unsafe _matchesSuffix(p, count: 9, 0x65, 0x78, 0x74, 0x65, 0x6E, 0x73, 0x69, 0x6F, 0x6E) {
+            if unsafe _matchesSuffix(
+                p,
+                count: 9,
+                (0x65, 0x78, 0x74, 0x65, 0x6E, 0x73, 0x69, 0x6F, 0x6E)
+            ) {
                 self = .extension
                 return
             }  // "extension"
             return nil
 
         case 0x73:  // 's'
-            if unsafe _matchesSuffix(p, count: 9, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74) {
+            if unsafe _matchesSuffix(
+                p,
+                count: 9,
+                (0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74)
+            ) {
                 self = .subscript
                 return
             }  // "subscript"
             return nil
 
         case 0x74:  // 't'
-            if unsafe _matchesSuffix(p, count: 9, 0x74, 0x79, 0x70, 0x65, 0x61, 0x6C, 0x69, 0x61, 0x73) {
+            if unsafe _matchesSuffix(
+                p,
+                count: 9,
+                (0x74, 0x79, 0x70, 0x65, 0x61, 0x6C, 0x69, 0x61, 0x73)
+            ) {
                 self = .typealias
                 return
             }  // "typealias"
@@ -558,17 +584,11 @@ package func _matchesTail5(
 package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
-    _ b0: UInt8,
-    _ b1: UInt8,
-    _ b2: UInt8,
-    _ b3: UInt8,
-    _ b4: UInt8,
-    _ b5: UInt8,
-    _ b6: UInt8
+    _ bytes: (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8)
 ) -> Bool {
-    unsafe (p[0] == b0 && p[1] == b1 && p[2] == b2
-        && p[3] == b3 && p[4] == b4 && p[5] == b5
-        && p[6] == b6)
+    unsafe (p[0] == bytes.0 && p[1] == bytes.1 && p[2] == bytes.2
+        && p[3] == bytes.3 && p[4] == bytes.4 && p[5] == bytes.5
+        && p[6] == bytes.6)
 }
 
 @inlinable
@@ -576,18 +596,11 @@ package func _matchesSuffix(
 package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
-    _ b0: UInt8,
-    _ b1: UInt8,
-    _ b2: UInt8,
-    _ b3: UInt8,
-    _ b4: UInt8,
-    _ b5: UInt8,
-    _ b6: UInt8,
-    _ b7: UInt8
+    _ bytes: (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8)
 ) -> Bool {
-    unsafe (p[0] == b0 && p[1] == b1 && p[2] == b2
-        && p[3] == b3 && p[4] == b4 && p[5] == b5
-        && p[6] == b6 && p[7] == b7)
+    unsafe (p[0] == bytes.0 && p[1] == bytes.1 && p[2] == bytes.2
+        && p[3] == bytes.3 && p[4] == bytes.4 && p[5] == bytes.5
+        && p[6] == bytes.6 && p[7] == bytes.7)
 }
 
 @inlinable
@@ -595,19 +608,11 @@ package func _matchesSuffix(
 package func _matchesSuffix(
     _ p: UnsafePointer<UInt8>,
     count: Int,
-    _ b0: UInt8,
-    _ b1: UInt8,
-    _ b2: UInt8,
-    _ b3: UInt8,
-    _ b4: UInt8,
-    _ b5: UInt8,
-    _ b6: UInt8,
-    _ b7: UInt8,
-    _ b8: UInt8
+    _ bytes: (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8)
 ) -> Bool {
-    unsafe (p[0] == b0 && p[1] == b1 && p[2] == b2
-        && p[3] == b3 && p[4] == b4 && p[5] == b5
-        && p[6] == b6 && p[7] == b7 && p[8] == b8)
+    unsafe (p[0] == bytes.0 && p[1] == bytes.1 && p[2] == bytes.2
+        && p[3] == bytes.3 && p[4] == bytes.4 && p[5] == bytes.5
+        && p[6] == bytes.6 && p[7] == bytes.7 && p[8] == bytes.8)
 }
 
 /// Matches a long keyword using StaticString comparison.
