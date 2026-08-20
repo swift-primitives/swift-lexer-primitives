@@ -430,7 +430,7 @@ extension Lexer.Scanner {
         // Match known directives via span comparison.
         let kind: Token.Kind? = extract(from: after, to: end)
             .withUnsafeBufferPointer { buf -> Token.Kind? in
-                guard let p = unsafe buf.baseAddress else { return nil }
+                guard let p = buf.baseAddress else { return nil }
                 switch buf.count {
                 case 2 where unsafe p[0] == .ascii.i && p[1] == .ascii.f:
                     return .poundIf

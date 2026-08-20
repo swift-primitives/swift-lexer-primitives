@@ -37,19 +37,19 @@ extension Token.Keyword {
     /// | 15 | 1 | precedencegroup |
     @inlinable
     public init?(_ utf8: UnsafeBufferPointer<UInt8>) {
-        guard let base = unsafe utf8.baseAddress else { return nil }
+        guard let base = utf8.baseAddress else { return nil }
         switch utf8.count {
-        case 2: self.init(_length2: base)
-        case 3: self.init(_length3: base)
-        case 4: self.init(_length4: base)
-        case 5: self.init(_length5: base)
-        case 6: self.init(_length6: base)
-        case 7: self.init(_length7: base)
-        case 8: self.init(_length8: base)
-        case 9: self.init(_length9: base)
-        case 11: self.init(_length11: base)
-        case 14: self.init(_length14: base)
-        case 15: self.init(_length15: base)
+        case 2: unsafe self.init(_length2: base)
+        case 3: unsafe self.init(_length3: base)
+        case 4: unsafe self.init(_length4: base)
+        case 5: unsafe self.init(_length5: base)
+        case 6: unsafe self.init(_length6: base)
+        case 7: unsafe self.init(_length7: base)
+        case 8: unsafe self.init(_length8: base)
+        case 9: unsafe self.init(_length9: base)
+        case 11: unsafe self.init(_length11: base)
+        case 14: unsafe self.init(_length14: base)
+        case 15: unsafe self.init(_length15: base)
         default: return nil
         }
     }
@@ -64,12 +64,12 @@ extension Token.Keyword {
     /// so `withMemoryRebound` is the Swift-safe reinterpretation path.
     @inlinable
     public init?(_ utf8: UnsafeBufferPointer<Byte>) {
-        guard let base = unsafe utf8.baseAddress else { return nil }
+        guard let base = utf8.baseAddress else { return nil }
         let result: Token.Keyword? = unsafe base.withMemoryRebound(
             to: UInt8.self,
             capacity: utf8.count
         ) { ptr in
-            Token.Keyword(unsafe UnsafeBufferPointer<UInt8>(start: ptr, count: utf8.count))
+            unsafe Token.Keyword(unsafe UnsafeBufferPointer<UInt8>(start: ptr, count: utf8.count))
         }
         guard let result else { return nil }
         self = result

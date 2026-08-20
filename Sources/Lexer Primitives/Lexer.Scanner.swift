@@ -11,9 +11,9 @@
 
 public import Byte_Primitives
 public import Cursor_Primitive
-public import Cursor_Primitives
+import Cursor_Primitives
 public import Memory_Cursor_Primitives
-public import Memory_Primitive
+import Memory_Primitive
 // W3 PRUNE: Cursor<Text>.storage is now Swift.Span<Byte>; the cursor
 // operations dispatch on `Swift.Span: Span.`Protocol`` (the
 // linchpin conformance), which must be imported DIRECTLY here for the
