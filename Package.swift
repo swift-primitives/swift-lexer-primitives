@@ -34,19 +34,12 @@ let package = Package(
             url: "https://github.com/swift-primitives/swift-cursor-primitives.git",
             branch: "main"
         ),
-        // W3 PRUNE: path-dep every CHANGED package lexer needs (directly or
-        // transitively). `Cursor<Text>(span)` now uses the cursor base init
-        // (Text.Borrowed == Swift.Span<Byte>); the deleted byte-cursor
-        // convenience init is no longer referenced. `text` is path-dep'd as a
-        // transitive override (lexer → token → text) so its identity unifies
-        // with the W3 version under SwiftPM's root-local-override (Finding 7).
+
         .package(
             url: "https://github.com/swift-primitives/swift-memory-cursor-primitives.git",
             branch: "main"
         ),
-        // Direct dep so Lexer.Scanner.swift can import Memory_Primitive for the
-        // `Memory` namespace (was reached transitively via a now-deleted
-        // re-export).
+
         .package(
             url: "https://github.com/swift-primitives/swift-memory-primitives.git",
             branch: "main"
@@ -55,9 +48,7 @@ let package = Package(
             url: "https://github.com/swift-primitives/swift-byte-primitives.git",
             branch: "main"
         ),
-        // W3 PRUNE: direct dep so Lexer.Scanner.swift can import
-        // Span_Protocol_Primitives for the Swift.Span: Span.`Protocol`
-        // conformance (Finding 3/8).
+
         .package(
             url: "https://github.com/swift-primitives/swift-span-primitives.git",
             branch: "main"

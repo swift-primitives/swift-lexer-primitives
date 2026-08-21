@@ -1,24 +1,6 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-lexer-primitives open source project
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp and the swift-lexer-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Lexer_Primitives
 import Testing
 
-/// Minimal format witness used to validate the L1 ``Lexer/Pull/Stream``
-/// cohort.
-///
-/// The format is a balanced-bracket grammar: `[` opens a
-/// container, `]` closes it. Whitespace bytes (0x20, 0x09, 0x0A, 0x0D)
-/// are skipped between tokens. No payload, no escapes — the smallest
-/// surface that exercises the generic substrate.
 enum Bracket {}
 
 extension Bracket {
@@ -63,13 +45,13 @@ extension Bracket.Tokens {
         skip(whitespace: &scanner)
         guard let byte = scanner.peek() else { return nil }
         switch byte {
-        case 0x5B:  // '['
+        case 0x5B:
             depth &+= 1
             if depth > limit { throw .unbalanced }
             scanner.advance()
             return .open
 
-        case 0x5D:  // ']'
+        case 0x5D:
             scanner.advance()
             depth &-= 1
             return .close
@@ -84,8 +66,7 @@ extension Bracket.Tokens {
         depth: inout Int,
         limit: Int
     ) throws(Error) {
-        // For brackets, a "value" is a balanced container; consume
-        // tokens until depth returns to its entry value.
+
         let entryDepth = depth
         repeat {
             guard try next(scanner: &scanner, depth: &depth, limit: limit) != nil else {
@@ -181,7 +162,7 @@ extension Lexer.Pull {
             try withSpan("  [") { span in
                 var stream = Lexer.Pull.Stream<Bracket.Tokens>(span)
                 #expect(stream.peek() == 0x5B)
-                #expect(stream.peek() == 0x5B)  // idempotent
+                #expect(stream.peek() == 0x5B)
                 let kind = try stream.next()
                 #expect(kind == .open)
             }
@@ -201,11 +182,9 @@ extension Lexer.Pull {
         func `position reports current byte offset`() throws {
             try withSpan("  []") { span in
                 var stream = Lexer.Pull.Stream<Bracket.Tokens>(span)
-                _ = try stream.next()  // advances past whitespace + '['
-                // swift-linter:disable:next raw value access
-                // REASON: test-only assertion on the cursor's byte offset,
-                // bridged through the typed Int(bitPattern:) boundary.
-                #expect(Int(bitPattern: stream.position) == 3)  // cursor sits at ']'
+                _ = try stream.next()
+
+                #expect(Int(bitPattern: stream.position) == 3)
             }
         }
 
@@ -213,15 +192,14 @@ extension Lexer.Pull {
         func `skip on balanced nested container consumes the entire value`() throws {
             try withSpan("[[[]]]") { span in
                 var stream = Lexer.Pull.Stream<Bracket.Tokens>(span)
-                try stream.skip()  // consume one complete value at cursor
+                try stream.skip()
                 let tail = try stream.next()
-                #expect(tail == nil)  // entire input consumed
+                #expect(tail == nil)
             }
         }
     }
 }
 
-/// Minimal strategy witness exercising the FAST/SLOW gate.
 extension Bracket {
     enum Count: Lexer.Pull.Assemble.Strategy {}
 }
@@ -234,7 +212,7 @@ extension Bracket.Count {
         bytes: Swift.Span<Byte>,
         limit: Int
     ) throws(Bracket.Tokens.Error) -> Int {
-        // Wholesale fast-path: count opens by direct byte scan.
+
         var count = 0
         bytes.indices.forEach { i in
             if bytes[i] == 0x5B { count &+= 1 }
@@ -245,7 +223,7 @@ extension Bracket.Count {
     static func build(
         events: inout Lexer.Pull.Stream<Bracket.Tokens>
     ) throws(Bracket.Tokens.Error) -> Int {
-        // Slow-path: count opens by walking events.
+
         var count = 0
         while let kind = try events.next() {
             if kind == .open { count &+= 1 }
@@ -276,7 +254,7 @@ extension Lexer.Pull.Assemble {
                 #expect(stream.isPristine == true)
                 let count = try Lexer.Pull.Assemble.from(&stream, strategy: Bracket.Count.self)
                 #expect(count == 3)
-                // Fast-path marks the stream consumed.
+
                 let tail = try stream.next()
                 #expect(tail == nil)
             }
@@ -286,8 +264,8 @@ extension Lexer.Pull.Assemble {
         func `SLOW path fires when stream is no longer pristine`() throws {
             try withSpan("[[[]]]") { span in
                 var stream = Lexer.Pull.Stream<Bracket.Tokens>(span)
-                _ = try stream.next()  // pristine cleared; depth=1
-                // Slow path: count remaining opens (2 more, since one already pulled).
+                _ = try stream.next()
+
                 let count = try Lexer.Pull.Assemble.from(&stream, strategy: Bracket.Count.self)
                 #expect(count == 2)
             }

@@ -1,23 +1,5 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-lexer-primitives open source project
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp and the swift-lexer-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
-// MARK: - Public Entry Point
-
 extension Lexer.Scanner {
-    /// Produces the next ``Lexer/Lexeme``, or `nil` after end-of-file has
-    /// been emitted.
-    ///
-    /// Each call scans leading trivia (whitespace, newlines, comments),
-    /// one token body, and trailing trivia (same-line horizontal whitespace).
-    /// Errors are appended to `diagnostics`; the scanner always advances.
+
     @inlinable
     @_lifetime(self: copy self)
     public mutating func next(
@@ -56,14 +38,8 @@ extension Lexer.Scanner {
     }
 }
 
-// MARK: - Trivia
-
 extension Lexer.Scanner {
-    /// Skips leading trivia: whitespace, newlines, line comments, block
-    /// comments.
-    ///
-    /// Mirrors swift-syntax convention: leading trivia includes
-    /// everything before the token, including vertical whitespace.
+
     @inlinable
     @_lifetime(self: copy self)
     package mutating func leading(
@@ -78,7 +54,7 @@ extension Lexer.Scanner {
             case .ascii.cr:
                 tracker.newline(at: cursor)
                 cursor += .one
-                // CRLF: consume the LF so it isn't counted as a second newline.
+
                 if contains(cursor) && byte(at: cursor) == .ascii.lf {
                     cursor += .one
                 }
@@ -89,7 +65,7 @@ extension Lexer.Scanner {
 
             case .ascii.slash:
                 if peek(at: .one) == .ascii.slash {
-                    // Line comment: skip to end of line.
+
                     cursor += .one
                     cursor += .one
                     while contains(cursor) {
@@ -109,9 +85,6 @@ extension Lexer.Scanner {
         }
     }
 
-    /// Skips trailing trivia: horizontal whitespace only (space, tab).
-    ///
-    /// Stops at newline per swift-syntax convention.
     @inlinable
     @inline(__always)
     @_lifetime(self: copy self)
@@ -123,15 +96,14 @@ extension Lexer.Scanner {
         }
     }
 
-    /// Skips a block comment from `/*` through `*/`, supporting nesting.
     @inlinable
     @_lifetime(self: copy self)
     package mutating func comment(
         diagnostics: inout [Lexer.Error]
     ) {
         let start = cursor
-        cursor += .one  // '/'
-        cursor += .one  // '*'
+        cursor += .one
+        cursor += .one
         var depth = 1
 
         while contains(cursor) && depth > 0 {
@@ -164,10 +136,8 @@ extension Lexer.Scanner {
     }
 }
 
-// MARK: - Token Dispatch
-
 extension Lexer.Scanner {
-    /// Dispatches to the appropriate sub-scanner based on the current byte.
+
     @inlinable
     @_lifetime(self: copy self)
     package mutating func token(
@@ -290,10 +260,8 @@ extension Lexer.Scanner {
     }
 }
 
-// MARK: - Token Scanners
-
 extension Lexer.Scanner {
-    /// Scans an identifier or keyword.
+
     @inlinable
     @_lifetime(self: copy self)
     package mutating func identifier() -> Token.Kind {
@@ -322,7 +290,6 @@ extension Lexer.Scanner {
         return .identifier
     }
 
-    /// Scans a dollar identifier (`$0`, `$1`, etc.).
     @inlinable
     @_lifetime(self: copy self)
     package mutating func dollar() -> Token.Kind {
@@ -335,15 +302,12 @@ extension Lexer.Scanner {
         return .dollarIdentifier
     }
 
-    /// Scans a numeric literal: decimal, hex (`0x`), binary (`0b`),
-    /// octal (`0o`), or floating-point (with `.` or `e`/`E` exponent).
     @inlinable
     @_lifetime(self: copy self)
     package mutating func number() -> Token.Kind {
         var isFloat = false
         let first = byte(at: cursor)
 
-        // Prefixed bases: 0x, 0b, 0o
         if first == .ascii.`0`, let next = peek(at: .one) {
             switch next {
             case .ascii.x, .ascii.X:
@@ -368,10 +332,8 @@ extension Lexer.Scanner {
             }
         }
 
-        // Decimal digits
         digits(Lexer.Classify.isDecimalDigit)
 
-        // Fractional part: '.' followed by digit
         if contains(cursor) && byte(at: cursor) == .ascii.period {
             if let d = peek(at: .one), Lexer.Classify.isDecimalDigit(d) {
                 cursor += .one
@@ -380,7 +342,6 @@ extension Lexer.Scanner {
             }
         }
 
-        // Exponent: e/E [+-]? digits
         if contains(cursor) {
             let b = byte(at: cursor)
             if b == .ascii.e || b == .ascii.E {
@@ -397,7 +358,6 @@ extension Lexer.Scanner {
         return isFloat ? .floatingLiteral : .integerLiteral
     }
 
-    /// Consumes digits (and underscore separators) for the given predicate.
     @inlinable
     @_lifetime(self: copy self)
     package mutating func digits(
@@ -414,20 +374,16 @@ extension Lexer.Scanner {
         }
     }
 
-    /// Scans a `#`-prefixed directive (`#if`, `#else`, `#elseif`, `#endif`)
-    /// or falls back to a bare `#` (`.pound`).
     @inlinable
     @_lifetime(self: copy self)
     package mutating func directive() -> Token.Kind {
         let after = cursor + .one
 
-        // Probe identifier characters after '#' without advancing cursor.
         var end = after
         while contains(end) && Lexer.Classify.isIdentifierContinuation(byte(at: end)) {
             end += .one
         }
 
-        // Match known directives via span comparison.
         let kind: Token.Kind? = extract(from: after, to: end)
             .withUnsafeBufferPointer { buf -> Token.Kind? in
                 guard let p = buf.baseAddress else { return nil }
@@ -466,9 +422,6 @@ extension Lexer.Scanner {
         return .pound
     }
 
-    /// Scans a double-quoted string literal.
-    ///
-    /// Handles `\"` escapes.
     @inlinable
     @_lifetime(self: copy self)
     package mutating func string(
@@ -501,7 +454,6 @@ extension Lexer.Scanner {
         return .stringLiteral
     }
 
-    /// Scans an operator (one or more operator-continuation characters).
     @inlinable
     @_lifetime(self: copy self)
     package mutating func `operator`() -> Token.Kind {

@@ -1,22 +1,9 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-lexer-primitives open source project
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp and the swift-lexer-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Lexer_Primitives
 import Testing
 
 extension Lexer.Scanner {
     @Suite("Lexer.Scanner")
     struct Test {
-
-        // MARK: - Helpers
 
         private func kinds(
             from source: String
@@ -34,15 +21,11 @@ extension Lexer.Scanner {
             }
         }
 
-        // MARK: - Empty Input
-
         @Test func `empty input`() {
             let (kinds, diagnostics) = kinds(from: "")
             #expect(kinds == [.endOfFile])
             #expect(diagnostics.isEmpty)
         }
-
-        // MARK: - Identifiers and Keywords
 
         @Test func identifier() {
             let (kinds, _) = kinds(from: "foo")
@@ -73,8 +56,6 @@ extension Lexer.Scanner {
             let (kinds, _) = kinds(from: "$0")
             #expect(kinds == [.dollarIdentifier, .endOfFile])
         }
-
-        // MARK: - Integer Literals
 
         @Test func `integer literal`() {
             let (kinds, _) = kinds(from: "42")
@@ -116,8 +97,6 @@ extension Lexer.Scanner {
             #expect(kinds == [.floatingLiteral, .endOfFile])
         }
 
-        // MARK: - String Literals
-
         @Test func `string literal`() {
             let (kinds, _) = kinds(from: #""hello""#)
             #expect(kinds == [.stringLiteral, .endOfFile])
@@ -128,8 +107,6 @@ extension Lexer.Scanner {
             #expect(kinds == [.stringLiteral, .endOfFile])
             #expect(diagnostics.count == 1)
         }
-
-        // MARK: - Punctuation
 
         @Test func braces() {
             let (kinds, _) = kinds(from: "{}")
@@ -151,14 +128,10 @@ extension Lexer.Scanner {
             #expect(kinds == [.ellipsis, .endOfFile])
         }
 
-        // MARK: - Operators
-
         @Test func `binary operator`() {
             let (kinds, _) = kinds(from: "+")
             #expect(kinds == [.binaryOperator, .endOfFile])
         }
-
-        // MARK: - Comments
 
         @Test func `line comment`() {
             let (kinds, diagnostics) = kinds(from: "// comment\nfoo")
@@ -184,8 +157,6 @@ extension Lexer.Scanner {
             #expect(diagnostics.count == 1)
         }
 
-        // MARK: - Trivia Tracking
-
         @Test func `leading trivia`() {
             let source = "  foo"
             let bytes: [Byte] = source.utf8.map(Byte.init)
@@ -208,12 +179,10 @@ extension Lexer.Scanner {
                 var diagnostics: [Lexer.Error] = []
                 let lexeme = scanner.next(diagnostics: &diagnostics)
                 #expect(lexeme?.kind == .identifier)
-                // Trailing trivia is horizontal whitespace only — stops at newline.
+
                 #expect(lexeme?.trailingTriviaLength == Text.Count(Cardinal(2)))
             }
         }
-
-        // MARK: - Location Tracking
 
         @Test func `location tracking`() {
             let source = "let\nx"
@@ -222,17 +191,15 @@ extension Lexer.Scanner {
                 let span = unsafe Span(_unsafeElements: buffer)
                 var scanner = Lexer.Scanner(span)
                 var diagnostics: [Lexer.Error] = []
-                // "let" on line 1
+
                 let first = scanner.next(diagnostics: &diagnostics)
                 #expect(first?.kind == .keyword(.let))
-                // "x" on line 2, column 1
+
                 let second = scanner.next(diagnostics: &diagnostics)
                 #expect(second?.kind == .identifier)
                 #expect(scanner.location.line == Text.Line.Number(2))
             }
         }
-
-        // MARK: - Conditional Compilation
 
         @Test func `pound if`() {
             let (kinds, _) = kinds(from: "#if FOO")
@@ -259,16 +226,12 @@ extension Lexer.Scanner {
             #expect(kinds == [.pound, .identifier, .endOfFile])
         }
 
-        // MARK: - Unknown Characters
-
         @Test func `unknown character`() {
             let (kinds, diagnostics) = kinds(from: "§")
-            // Multi-byte UTF-8 character — scanner advances past each byte.
+
             #expect(kinds.contains(.unknown))
             #expect(!diagnostics.isEmpty)
         }
-
-        // MARK: - Mixed Input
 
         @Test func `simple declaration`() {
             let (kinds, _) = kinds(from: "let x = 42")
@@ -292,7 +255,7 @@ extension Lexer.Scanner {
                     .leftParen,
                     .rightParen,
                     .arrow,
-                    .identifier,  // "Int" is an identifier, not a keyword
+                    .identifier,
                     .endOfFile,
                 ]
             )
