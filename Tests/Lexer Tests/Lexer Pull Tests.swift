@@ -1,4 +1,4 @@
-import Lexer_Primitives
+import Lexer
 import Testing
 
 enum Bracket {}

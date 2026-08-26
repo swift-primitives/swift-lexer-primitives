@@ -1,4 +1,4 @@
-# Lexer Primitives
+# Lexer
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
@@ -11,7 +11,7 @@ A byte-cursor lexical scanner and a pull-mode structural-event substrate for tur
 `Lexer.Scanner` walks a borrowed `Span<Byte>` and emits one ``Lexer.Lexeme`` per call: a token `kind`, the byte `range` of the token text, and the byte lengths of its leading and trailing trivia (whitespace and comments). The scanner always makes progress — malformed input produces `.unknown` lexemes plus diagnostics rather than throwing — so callers drain it in a `while let` loop and inspect the diagnostics afterward.
 
 ```swift
-import Lexer_Primitives
+import Lexer
 
 let source = "let x = 42"
 let bytes: [Byte] = source.utf8.map(Byte.init)
@@ -34,7 +34,7 @@ The scanner classifies identifiers and keywords, numeric literals (decimal, `0x`
 For structural formats (JSON, XML, CBOR, …) the package also ships `Lexer.Pull` — a generic, `~Copyable & ~Escapable` event cursor. A format supplies a `Lexer.Pull.Tokens` witness describing its token vocabulary, whitespace, and depth rules; `Lexer.Pull.Stream` drives it with depth tracking and a pristine/consumed fast-path gate, and `Lexer.Pull.Assemble` chooses between a wholesale parse and an event-by-event rebuild.
 
 ```swift
-import Lexer_Primitives
+import Lexer
 
 // A format plugs into the substrate by conforming to Lexer.Pull.Tokens,
 // then drives events through the generic stream:
@@ -50,7 +50,7 @@ while let kind = try stream.next() {
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-lexer-primitives.git", branch: "main")
+    .package(url: "https://github.com/swift-molecules/swift-lexer.git", branch: "main")
 ]
 ```
 
@@ -58,7 +58,7 @@ dependencies: [
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Lexer Primitives", package: "swift-lexer-primitives"),
+        .product(name: "Lexer", package: "swift-lexer"),
     ]
 )
 ```
@@ -73,8 +73,8 @@ Two library products. Builds on the `Byte`, `Token`, `Cursor`, and `Text` primit
 
 | Product | Target | Purpose |
 |---------|--------|---------|
-| `Lexer Primitives` | `Sources/Lexer Primitives/` | The `Lexer` namespace: `Lexer.Scanner` (cursor-based byte scanner), `Lexer.Lexeme`, `Lexer.Trivia`, `Lexer.Error`, `Lexer.Position`, and `Lexer.Classify` (ASCII-subset character predicates); the `Lexer.Pull` pull-mode cohort (`Stream`, `Tokens`, `Assemble`, `Assemble.Strategy`); and `Token.Keyword` UTF-8 reverse lookup. |
-| `Lexer Primitives Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
+| `Lexer` | `Sources/Lexer/` | The `Lexer` namespace: `Lexer.Scanner` (cursor-based byte scanner), `Lexer.Lexeme`, `Lexer.Trivia`, `Lexer.Error`, `Lexer.Position`, and `Lexer.Classify` (ASCII-subset character predicates); the `Lexer.Pull` pull-mode cohort (`Stream`, `Tokens`, `Assemble`, `Assemble.Strategy`); and `Token.Keyword` UTF-8 reverse lookup. |
+| `Lexer Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
 
 Foundation-free.
 

@@ -1,9 +1,9 @@
-public import Byte_Primitives
+public import Byte
 public import Cursor_Primitive
-import Cursor_Primitives
-public import Memory_Cursor_Primitives
+import Cursor
+public import Memory_Cursor
 import Memory_Primitive
-public import Span_Protocol_Primitives
+public import Span_Protocol
 
 extension Lexer {
 

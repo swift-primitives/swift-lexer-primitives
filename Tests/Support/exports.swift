@@ -1,2 +1,2 @@
-@_exported public import Lexer_Primitives
-@_exported public import Token_Primitives_Test_Support
+@_exported public import Lexer
+@_exported public import Token_Test_Support
