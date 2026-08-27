@@ -1,3 +1,6 @@
+public import Text
+public import Token
+
 extension Lexer {
 
     public struct Lexeme: Sendable, Equatable, Hashable {

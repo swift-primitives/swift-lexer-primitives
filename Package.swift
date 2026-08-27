@@ -17,40 +17,45 @@ let package = Package(
             targets: ["Lexer"]
         ),
         .library(
-            name: "Lexer Test Support",
-            targets: ["Lexer Test Support"]
+            name: "Lexer Standard Library Integration",
+            targets: ["Lexer Standard Library Integration"]
+        ),
+        .library(
+            name: "Lexer Apple Foundation Integration",
+            targets: ["Lexer Apple Foundation Integration"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-token.git",
+            url: "https://github.com/swift-atoms/swift-token.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-ascii.git",
+            url: "https://github.com/swift-atoms/swift-ascii.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-cursor.git",
+            url: "https://github.com/swift-atoms/swift-cursor.git",
             branch: "main"
         ),
-
         .package(
             url: "https://github.com/swift-molecules/swift-memory-cursor.git",
             branch: "main"
         ),
-
         .package(
-            url: "https://github.com/swift-molecules/swift-memory.git",
+            url: "https://github.com/swift-atoms/swift-byte.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-byte.git",
+            url: "https://github.com/swift-atoms/swift-span.git",
             branch: "main"
         ),
-
         .package(
-            url: "https://github.com/swift-molecules/swift-span.git",
+            url: "https://github.com/swift-atoms/swift-text.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-atoms/swift-affine.git",
             branch: "main"
         ),
     ],
@@ -61,23 +66,26 @@ let package = Package(
                 .product(name: "Token", package: "swift-token"),
                 .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "Cursor", package: "swift-cursor"),
-                .product(name: "Cursor Primitive", package: "swift-cursor"),
                 .product(
                     name: "Memory Cursor",
                     package: "swift-memory-cursor"
                 ),
-                .product(name: "Memory Primitive", package: "swift-memory"),
                 .product(name: "Byte", package: "swift-byte"),
-                .product(name: "Span Protocol", package: "swift-span"),
+                .product(name: "Span", package: "swift-span"),
+                .product(name: "Text", package: "swift-text"),
+                .product(name: "Affine", package: "swift-affine"),
             ]
         ),
         .target(
-            name: "Lexer Test Support",
+            name: "Lexer Standard Library Integration",
+            dependencies: ["Lexer"]
+        ),
+        .target(
+            name: "Lexer Apple Foundation Integration",
             dependencies: [
                 "Lexer",
-                .product(name: "Token Test Support", package: "swift-token"),
-            ],
-            path: "Tests/Support"
+                "Lexer Standard Library Integration",
+            ]
         ),
         .testTarget(
             name: "Lexer Tests",

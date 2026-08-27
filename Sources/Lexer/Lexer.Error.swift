@@ -1,3 +1,5 @@
+public import Text
+
 extension Lexer {
 
     public enum Error: Swift.Error, Sendable, Equatable, Hashable {

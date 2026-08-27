@@ -1,3 +1,7 @@
+public import Byte
+public import Text
+public import Token
+
 extension Lexer.Scanner {
 
     @inlinable

@@ -1,3 +1,5 @@
+public import Text
+
 extension Lexer {
 
     public enum Trivia: Sendable, Equatable, Hashable {

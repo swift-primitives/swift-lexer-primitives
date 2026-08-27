@@ -1,3 +1,6 @@
+public import Byte
+public import Token
+
 extension Token.Keyword {
 
     @inlinable

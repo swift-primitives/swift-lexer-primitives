@@ -1,9 +1,9 @@
+public import Affine
 public import Byte
-public import Cursor_Primitive
-import Cursor
+public import Cursor
 public import Memory_Cursor
-import Memory_Primitive
-public import Span_Protocol
+public import Span
+public import Text
 
 extension Lexer {
 

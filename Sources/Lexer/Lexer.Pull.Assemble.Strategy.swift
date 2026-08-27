@@ -1,3 +1,5 @@
+public import Byte
+
 extension Lexer.Pull.Assemble {
 
     public protocol Strategy {

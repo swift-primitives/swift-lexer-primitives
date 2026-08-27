@@ -1,3 +1,6 @@
+public import ASCII
+public import Byte
+
 extension Lexer {
 
     public enum Classify {}
