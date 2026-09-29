@@ -1,5 +1,9 @@
+import Byte
+import Cardinal
 import Lexer
 import Testing
+import Text
+import Token
 
 extension Lexer.Scanner {
     @Suite("Lexer.Scanner")
@@ -8,7 +12,7 @@ extension Lexer.Scanner {
         private func kinds(
             from source: String
         ) -> (kinds: [Token.Kind], diagnostics: [Lexer.Error]) {
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             return bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 var scanner = Lexer.Scanner(span)
@@ -159,7 +163,7 @@ extension Lexer.Scanner {
 
         @Test func `leading trivia`() {
             let source = "  foo"
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 var scanner = Lexer.Scanner(span)
@@ -172,7 +176,7 @@ extension Lexer.Scanner {
 
         @Test func `trailing trivia`() {
             let source = "foo  \nbar"
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 var scanner = Lexer.Scanner(span)
@@ -186,7 +190,7 @@ extension Lexer.Scanner {
 
         @Test func `location tracking`() {
             let source = "let\nx"
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 var scanner = Lexer.Scanner(span)

@@ -10,17 +10,17 @@ extension Lexer.Classify {
 
     @inlinable
     public static func isIdentifierStart(_ byte: Byte) -> Bool {
-        ASCII.Classification.isLetter(byte.underlying) || byte == 0x5F
+        ASCII.Classification.isLetter(byte.underlying) || byte.underlying == 0x5F
     }
 
     @inlinable
     public static func isIdentifierContinuation(_ byte: Byte) -> Bool {
-        ASCII.Classification.isAlphanumeric(byte.underlying) || byte == 0x5F
+        ASCII.Classification.isAlphanumeric(byte.underlying) || byte.underlying == 0x5F
     }
 
     @inlinable
     public static func isOperatorStart(_ byte: Byte) -> Bool {
-        switch byte {
+        switch byte.underlying {
         case 0x2F,
             0x3D,
             0x2D,
@@ -44,17 +44,17 @@ extension Lexer.Classify {
 
     @inlinable
     public static func isOperatorContinuation(_ byte: Byte) -> Bool {
-        isOperatorStart(byte) || byte == 0x2E
+        isOperatorStart(byte) || byte.underlying == 0x2E
     }
 
     @inlinable
     public static func isHorizontalWhitespace(_ byte: Byte) -> Bool {
-        byte == 0x20 || byte == 0x09
+        byte.underlying == 0x20 || byte.underlying == 0x09
     }
 
     @inlinable
     public static func isNewline(_ byte: Byte) -> Bool {
-        byte == 0x0A || byte == 0x0D
+        byte.underlying == 0x0A || byte.underlying == 0x0D
     }
 
     @inlinable
@@ -69,11 +69,11 @@ extension Lexer.Classify {
 
     @inlinable
     public static func isBinaryDigit(_ byte: Byte) -> Bool {
-        byte == 0x30 || byte == 0x31
+        byte.underlying == 0x30 || byte.underlying == 0x31
     }
 
     @inlinable
     public static func isOctalDigit(_ byte: Byte) -> Bool {
-        byte >= 0x30 && byte <= 0x37
+        byte.underlying >= 0x30 && byte.underlying <= 0x37
     }
 }

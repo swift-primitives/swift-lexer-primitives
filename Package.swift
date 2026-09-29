@@ -57,6 +57,8 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-difference.git", branch: "main", traits: ["Tagged"]),
         .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main", traits: ["Cursor"]),
         .package(url: "https://github.com/swift-atoms/swift-ordinal.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-cardinal.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -76,7 +78,12 @@ let package = Package(
         ),
         .target(
             name: "Lexer Standard Library Integration",
-            dependencies: ["Lexer"]
+            dependencies: [
+                "Lexer",
+                .product(name: "Ordinal", package: "swift-ordinal"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Text", package: "swift-text"),
+            ]
         ),
         .target(
             name: "Lexer Apple Foundation Integration",
@@ -88,7 +95,11 @@ let package = Package(
         .testTarget(
             name: "Lexer Tests",
             dependencies: [
-                "Lexer"
+                "Lexer",
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "Cardinal", package: "swift-cardinal"),
+                .product(name: "Text", package: "swift-text"),
+                .product(name: "Token", package: "swift-token"),
             ]
         ),
     ],

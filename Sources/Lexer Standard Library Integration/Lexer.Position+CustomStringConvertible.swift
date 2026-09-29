@@ -1,4 +1,7 @@
 public import Lexer
+public import Ordinal
+public import Tagged
+public import Text
 
 extension Lexer.Position: CustomStringConvertible {
 

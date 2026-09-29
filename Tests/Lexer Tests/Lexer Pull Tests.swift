@@ -1,3 +1,4 @@
+import Byte
 import Lexer
 import Testing
 
@@ -27,7 +28,7 @@ extension Bracket.Tokens {
 
     static func skip(whitespace scanner: inout Lexer.Scanner) {
         while let byte = scanner.peek() {
-            switch byte {
+            switch byte.underlying {
             case 0x20, 0x09, 0x0A, 0x0D:
                 scanner.advance()
 
@@ -44,7 +45,7 @@ extension Bracket.Tokens {
     ) throws(Error) -> Kind? {
         skip(whitespace: &scanner)
         guard let byte = scanner.peek() else { return nil }
-        switch byte {
+        switch byte.underlying {
         case 0x5B:
             depth &+= 1
             if depth > limit { throw .unbalanced }
@@ -84,7 +85,7 @@ extension Lexer.Pull {
             _ source: String,
             _ body: (borrowing Swift.Span<Byte>) throws -> R
         ) rethrows -> R {
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             return try bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 return try body(span)
@@ -161,8 +162,8 @@ extension Lexer.Pull {
         func `peek returns next significant byte without consuming`() throws {
             try withSpan("  [") { span in
                 var stream = Lexer.Pull.Stream<Bracket.Tokens>(span)
-                #expect(stream.peek() == 0x5B)
-                #expect(stream.peek() == 0x5B)
+                #expect(stream.peek()?.underlying == 0x5B)
+                #expect(stream.peek()?.underlying == 0x5B)
                 let kind = try stream.next()
                 #expect(kind == .open)
             }
@@ -215,7 +216,7 @@ extension Bracket.Count {
 
         var count = 0
         bytes.indices.forEach { i in
-            if bytes[i] == 0x5B { count &+= 1 }
+            if bytes[i].underlying == 0x5B { count &+= 1 }
         }
         return count
     }
@@ -240,7 +241,7 @@ extension Lexer.Pull.Assemble {
             _ source: String,
             _ body: (borrowing Swift.Span<Byte>) throws -> R
         ) rethrows -> R {
-            let bytes: [Byte] = source.utf8.map(Byte.init)
+            let bytes: [Byte] = source.utf8.map(Byte.init(bitPattern:))
             return try bytes.withUnsafeBufferPointer { buffer in
                 let span = unsafe Span(_unsafeElements: buffer)
                 return try body(span)
