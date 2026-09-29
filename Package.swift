@@ -27,7 +27,7 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-atoms/swift-token.git",
+            url: "https://github.com/swift-molecules/swift-token.git",
             branch: "main"
         ),
         .package(
@@ -36,10 +36,6 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/swift-atoms/swift-cursor.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-memory-cursor.git",
             branch: "main"
         ),
         .package(
@@ -58,6 +54,9 @@ let package = Package(
             url: "https://github.com/swift-atoms/swift-affine.git",
             branch: "main"
         ),
+        .package(url: "https://github.com/swift-atoms/swift-difference.git", branch: "main", traits: ["Tagged"]),
+        .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main", traits: ["Cursor"]),
+        .package(url: "https://github.com/swift-atoms/swift-ordinal.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -66,14 +65,13 @@ let package = Package(
                 .product(name: "Token", package: "swift-token"),
                 .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "Cursor", package: "swift-cursor"),
-                .product(
-                    name: "Memory Cursor",
-                    package: "swift-memory-cursor"
-                ),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Span", package: "swift-span"),
                 .product(name: "Text", package: "swift-text"),
                 .product(name: "Affine", package: "swift-affine"),
+                .product(name: "Memory", package: "swift-memory"),
+                .product(name: "Difference", package: "swift-difference"),
+                .product(name: "Ordinal", package: "swift-ordinal"),
             ]
         ),
         .target(

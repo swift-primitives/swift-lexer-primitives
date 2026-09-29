@@ -1,7 +1,6 @@
-public import Affine
+public import Difference
+public import Ordinal
 public import Byte
-public import Cursor
-public import Memory_Cursor
 public import Span
 public import Text
 
@@ -11,7 +10,7 @@ extension Lexer {
     @safe
     public struct Scanner: ~Copyable, ~Escapable {
         @usableFromInline
-        internal var inner: Cursor<Text>
+        internal var offset: Int
 
         @usableFromInline
         internal let source: Swift.Span<Byte>
@@ -27,7 +26,7 @@ extension Lexer {
         public init(_ source: borrowing Swift.Span<Byte>) {
             self.source = copy source
 
-            self.inner = Cursor<Text>(copy source)
+            self.offset = 0
             self.hasEmittedEndOfFile = false
             self.tracker = Text.Location.Tracker()
         }
@@ -37,39 +36,44 @@ extension Lexer {
 extension Lexer.Scanner {
 
     @inlinable
-    public var position: Text.Position { inner.position }
+    public var position: Text.Position { Text.Position(_unchecked: Ordinal(UInt(offset))) }
 
     @inlinable
-    public var location: Text.Location { tracker.location(at: inner.position) }
+    public var location: Text.Location { tracker.location(at: position) }
 
     @inlinable
     public func location(at position: Text.Position) -> Text.Location {
+        guard let end = Int(exactly: position.underlying.rawValue), end <= source.count else {
+            preconditionFailure("Scanner location is outside the source")
+        }
         var tracker = Text.Location.Tracker()
-        var i: Text.Position = .zero
-        while i < position {
-            if byte(at: i) == 0x0A {
-                tracker.newline(at: i)
+        for index in 0..<end {
+            if source[index].bitPattern == 0x0A {
+                tracker.newline(at: Text.Position(_unchecked: Ordinal(UInt(index))))
             }
-            i += .one
         }
         return tracker.location(at: position)
     }
 
     @inlinable
-    public var isAtEnd: Bool { inner.isAtEnd }
+    public var isAtEnd: Bool { offset == source.count }
 
     @inlinable
-    public func peek() -> Byte? { inner.peek() }
+    public func peek() -> Byte? { isAtEnd ? nil : source[offset] }
 
     @inlinable
-    public func peek(at offset: Text.Count) -> Byte? { inner.peek(at: offset) }
+    public func peek(at distance: Text.Count) -> Byte? {
+        guard let distance = Int(exactly: distance.underlying.rawValue),
+              distance < source.count - offset else { return nil }
+        return source[offset + distance]
+    }
 
     @_disfavoredOverload
     @inlinable
-    public func peek<X: Byte.`Protocol`>() -> X? {
-        guard let byte = inner.peek() else { return nil }
-        do throws(X.Error) {
-            return try X(byte)
+    public func peek<X, Failure: Swift.Error>(validating validate: (Byte) throws(Failure) -> X) -> X? {
+        guard let byte = peek() else { return nil }
+        do throws(Failure) {
+            return try validate(byte)
         } catch {
             return nil
         }
@@ -77,10 +81,10 @@ extension Lexer.Scanner {
 
     @_disfavoredOverload
     @inlinable
-    public func peek<X: Byte.`Protocol`>(at offset: Text.Count) -> X? {
-        guard let byte = inner.peek(at: offset) else { return nil }
-        do throws(X.Error) {
-            return try X(byte)
+    public func peek<X, Failure: Swift.Error>(at offset: Text.Count, validating validate: (Byte) throws(Failure) -> X) -> X? {
+        guard let byte = peek(at: offset) else { return nil }
+        do throws(Failure) {
+            return try validate(byte)
         } catch {
             return nil
         }
@@ -88,15 +92,28 @@ extension Lexer.Scanner {
 
     @inlinable
     @_lifetime(self: copy self)
-    public mutating func advance() { inner.advance() }
+    public mutating func advance() {
+        precondition(offset < source.count, "Cannot advance past the scanner source")
+        offset += 1
+    }
 
     @inlinable
     @_lifetime(self: copy self)
-    public mutating func advance(by count: Text.Count) { inner.advance(by: count) }
+    public mutating func advance(by count: Text.Count) {
+        guard let count = Int(exactly: count.underlying.rawValue), count <= source.count - offset else {
+            preconditionFailure("Scanner advance is outside the source")
+        }
+        offset += count
+    }
 
     @inlinable
     @_lifetime(self: copy self)
-    public mutating func consume() -> Byte { inner.consume() }
+    public mutating func consume() -> Byte {
+        precondition(offset < source.count, "Cannot consume past the scanner source")
+        let byte = source[offset]
+        offset += 1
+        return byte
+    }
 
     @inlinable
     @_lifetime(self: copy self)
@@ -110,10 +127,15 @@ extension Lexer.Scanner {
     internal var cursor: Text.Position {
         @inlinable
 
-        get { inner.position }
+        get { position }
         @inlinable
         @_lifetime(self: copy self)
-        set { inner.seek(to: newValue) }
+        set {
+            guard let value = Int(exactly: newValue.underlying.rawValue), value <= source.count else {
+                preconditionFailure("Scanner checkpoint is outside the source")
+            }
+            offset = value
+        }
     }
 }
 
@@ -122,13 +144,17 @@ extension Lexer.Scanner {
     @inlinable
     @inline(__always)
     package func contains(_ position: Text.Position) -> Bool {
-        Int(bitPattern: position) < source.count
+        guard let index = Int(exactly: position.underlying.rawValue) else { return false }
+        return index < source.count
     }
 
     @inlinable
     @inline(__always)
     package func byte(at position: Text.Position) -> Byte {
-        source[Int(bitPattern: position)]
+        guard let index = Int(exactly: position.underlying.rawValue), index < source.count else {
+            preconditionFailure("Scanner position is outside the source")
+        }
+        return source[index]
     }
 
     @inlinable
@@ -138,9 +164,12 @@ extension Lexer.Scanner {
         from start: Text.Position,
         to end: Text.Position
     ) -> Swift.Span<Byte> {
-        source.extracting(
-            Int(bitPattern: start)..<Int(bitPattern: end)
-        )
+        guard let lower = Int(exactly: start.underlying.rawValue),
+              let upper = Int(exactly: end.underlying.rawValue),
+              lower <= upper, upper <= source.count else {
+            preconditionFailure("Scanner range is outside the source")
+        }
+        return source.extracting(lower..<upper)
     }
 
     @inlinable
@@ -150,10 +179,6 @@ extension Lexer.Scanner {
         to end: Text.Position
     ) -> Text.Count {
 
-        do throws(Affine.Discrete.Vector.Error) {
-            return try (end - start).magnitude
-        } catch {
-            return .zero
-        }
+        return (end - start).magnitude.map { $0.value }
     }
 }
